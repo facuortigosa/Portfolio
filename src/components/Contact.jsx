@@ -25,7 +25,7 @@ export default function Contact(){
 
         <aside className="card" aria-label="Información de contacto">
           <h3>Otras formas de contacto</h3>
-          <p style={{color:'var(--muted)'}}>Puedes escribirme por email o en redes profesionales.</p>
+          <p style={{color:'var(--muted)'}}>Puedes escribirme por email o en redes sociales.</p>
           <p style={{marginTop:12}}>
             <strong>Email</strong><br />
             <a href="mailto:facu_ortigosa@hotmail.com">facu_ortigosa@hotmail.com</a>

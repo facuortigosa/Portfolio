@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Michroma&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
 
 :root{
   --bg: #ffffff;
@@ -26,6 +25,8 @@ body{
   line-height:1.5;
   font-size:16px;
   -webkit-font-feature-settings: "liga" 0;
+  font-feature-settings: "liga" 0;
+  font-variant-ligatures: no-common-ligatures;
 }
 
 /* Contenedor principal */
@@ -67,7 +68,7 @@ main{
 }
 
 .logo-text {
-  font-family: 'Libre Baskerville', serif;
+  font-family: 'Source Code Pro', monospace;
   font-size: 27px;
   fill: #6b6b6b;
   letter-spacing: 6px;
@@ -241,12 +242,12 @@ main{
 } 
 
 .project-card--auditorio {
-  background: #000000;
+  background: linear-gradient(155deg, #05030d, #000000);
   color: #FFFFFFC4;
-  border: 1px solid #ddd;
+  border: 1px solid #248fd1;
   border-radius: 8px;
-  padding: 2rem;
-  font-family: sans-serif;
+  padding: 2rem; 
+  font-family: 'Michroma', sans-serif;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   animation: glitch 1s infinite;
@@ -268,6 +269,28 @@ main{
 
 .project-card--auditorio a {
   color: #003e68;
+  text-decoration: none;
+  font-weight: 600; 
+}
+
+.project-card--elmurito {
+  background: #ffffff;
+  color: #6a7444;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  padding: 2rem;
+  font-family: 'Bebas Neue', sans-serif ;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+} 
+
+.project-card--elmurito p {
+  color: #6a7444;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.project-card--elmurito a {
+  color: #cc6333;
   text-decoration: none;
   font-weight: 600; 
 } 

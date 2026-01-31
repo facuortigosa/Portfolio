@@ -2,17 +2,28 @@ import React from 'react'
 
 const sampleProjects = [
   {
-    title: 'Auditorio q',
-    desc: 'Descripción breve del proyecto A. Tech stack: React, Vite.',
-    link: 'https://mediumspringgreen-woodcock-378101.hostingersite.com/',
+    title: 'AUDITORIO Q',
+    desc: '',
+    link: 'https://auditorio-q-1itxecsf4bhu3bth.builder-preview.com/',
     className: 'project-card--auditorio'
   },
   {
     title: 'Terapias Milenarias',
-    desc: 'Descripción breve del proyecto B. UI minimalista y responsive.',
+    desc: '',
     link: 'https://terapiasmilenarias.com/',
     className: 'project-card--terapias'
+  },
+
+  {
+    title: 'REFUGIO EL MURITO',
+    desc: '',
+    link: 'https://refugio-el-murito-mje43loqxzsoklwq.builder-preview.com/',
+    className: 'project-card--elmurito'
   }
+  
+
+
+
 ]
 
 export default function Projects(){
