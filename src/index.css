@@ -247,7 +247,7 @@ main{
   border: 1px solid #248fd1;
   border-radius: 8px;
   padding: 2rem; 
-  font-family: 'Michroma', sans-serif;
+  font-family: 'Lucidity Expand';
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   animation: glitch 1s infinite;
@@ -255,7 +255,7 @@ main{
 
 .project-card--auditorio p {
   color: #FFFFFFC4;
-  font-size: 1rem;
+  font-size: 0.8rem;
   line-height: 1.5;
 }
 

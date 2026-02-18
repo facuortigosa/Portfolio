@@ -8,7 +8,7 @@ export default function About(){
         <p>
             Soy Técnico en Programación con enfoque en desarrollo web. Actualmente me encuentro en la búsqueda de mi primer empleo en el área IT, donde pueda aplicar mis conocimientos en React, JavaScript, HTML y CSS.
 
-He desarrollado proyectos personales y sitios web reales, trabajando con componentes reutilizables, diseño responsive y buenas prácticas de programación. Me considero una persona responsable, con muchas ganas de aprender y crecer profesionalmente dentro del mundo del desarrollo web.
+He desarrollado proyectos personales y sitios web reales, trabajando con componentes reutilizables, diseño responsive y buenas prácticas de programación.
         </p>
       </div>
     </div>

@@ -2,7 +2,7 @@ import React from 'react'
 
 const skills = [
   'React', 'JavaScript', 'HTML', 'CSS', 'Vite',
-  'Responsive Design', 'Accessibility', 'Git', 'UI/UX Basics'   
+  'Responsive Design', 'Accessibility', 'GitHub', 'UI/UX Basics'   
 ]
 
 export default function Skills(){

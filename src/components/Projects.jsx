@@ -20,8 +20,6 @@ const sampleProjects = [
     link: 'https://refugio-el-murito-mje43loqxzsoklwq.builder-preview.com/',
     className: 'project-card--elmurito'
   }
-  
-
 
 
 ]
