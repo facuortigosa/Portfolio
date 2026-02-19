@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Michroma&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+@import url(https://db.onlinewebfonts.com/c/25df0280fec38f4b5ba0acf8fb265940?family=Lucidity+Expand);
+@import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
 
 :root{
   --bg: #ffffff;
@@ -27,6 +29,10 @@ body{
   -webkit-font-feature-settings: "liga" 0;
   font-feature-settings: "liga" 0;
   font-variant-ligatures: no-common-ligatures;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 /* Contenedor principal */
@@ -245,6 +251,7 @@ main{
   background: linear-gradient(155deg, #05030d, #000000);
   color: #FFFFFFC4;
   border: 1px solid #248fd1;
+  font-size: 12px;
   border-radius: 8px;
   padding: 2rem; 
   font-family: 'Lucidity Expand';
@@ -294,6 +301,31 @@ main{
   text-decoration: none;
   font-weight: 600; 
 } 
+
+.project-card--bacan {
+  background: #562373;
+  color: #FAB910;
+  border: 1px solid #cccccc;
+  border-radius: 10px;
+  padding: 2rem;
+  font-family: 'General Sans Medium', sans-serif;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card--bacan p {
+  font-family: 'General Sans Medium', sans-serif;
+  color: #FAB910;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.project-card--bacan a {
+  color: #FFFFFF;
+  font-family: 'Fugaz One', cursive;
+  text-decoration: none;
+  font-weight: 600;
+}
 
 /* ===========================
    Skills

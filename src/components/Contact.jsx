@@ -1,25 +1,38 @@
-import React, { useState } from 'react'
+import React, { useRef } from 'react'
+import emailjs from '@emailjs/browser'
 
-export default function Contact(){
-  const [form, setForm] = useState({name:'', email:'', message:''})
-  const handleChange = e => setForm({...form, [e.target.name]: e.target.value})
-  const handleSubmit = e => {
+export default function Contact() {
+  const formRef = useRef()
+
+  const handleSubmit = (e) => {
     e.preventDefault()
-    // Formulario base: aquí puedes integrar tu backend o servicio de email
-    const mailto = `mailto:tu@email.com?subject=${encodeURIComponent('Contacto desde portfolio')}&body=${encodeURIComponent(
-      `Nombre: ${form.name}\nEmail: ${form.email}\n\n${form.message}`
-    )}`
-    window.location.href = mailto
+
+    emailjs.sendForm(
+      'service_rpodwpd',
+      'template_d789z5u',
+      formRef.current,
+      { publicKey: 'o8Tf6oJbaADI83tI2' }
+    )
+    .then(() => {
+      alert('Mensaje enviado con éxito!')
+    }, (error) => {
+      alert('Error al enviar: ' + error.text)
+    })
   }
 
   return (
     <div>
       <h2>Contacto</h2>
       <div className="contact-grid">
-        <form className="contact-form" onSubmit={handleSubmit} aria-label="Formulario de contacto">
-          <input className="input" name="name" placeholder="Nombre" value={form.name} onChange={handleChange} required />
-          <input className="input" name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} required />
-          <textarea className="input" name="message" rows="6" placeholder="Mensaje" value={form.message} onChange={handleChange} required />
+        <form
+          ref={formRef}
+          className="contact-form"
+          onSubmit={handleSubmit}
+          aria-label="Formulario de contacto"
+        >
+          <input className="input" name="user_name" placeholder="Nombre" required />
+          <input className="input" name="user_email" type="email" placeholder="Email" required />
+          <textarea className="input" name="message" rows="6" placeholder="Mensaje" required />
           <button className="button" type="submit">Enviar</button>
         </form>
 

@@ -1,7 +1,7 @@
 import React from 'react'
 
 const skills = [
-  'React', 'JavaScript', 'HTML', 'CSS', 'Vite',
+  'React', 'JavaScript', 'HTML', 'CSS', 'Node.js',
   'Responsive Design', 'Accessibility', 'GitHub', 'UI/UX Basics'   
 ]
 

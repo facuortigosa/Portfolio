@@ -19,6 +19,13 @@ const sampleProjects = [
     desc: '',
     link: 'https://refugio-el-murito-mje43loqxzsoklwq.builder-preview.com/',
     className: 'project-card--elmurito'
+  },
+
+  {
+    title: 'BACAN STREET FOOD',
+    desc: 'Proximamente',
+    link: 'https://www.instagram.com/bacanstreetfood/',
+    className: 'project-card--bacan'
   }
 
 
