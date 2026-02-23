@@ -2,7 +2,9 @@
  * BacanGame.jsx  —  Bacan Jungle Run  🍔
  * 
  */
-
+import jaggySheet from '../assets/jaggy_sheet.png';
+import alienSheet from '../assets/alien_sheet.png';
+import burgerSheet from '../assets/burger_sheet.png';
 import Phaser from 'phaser';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -52,37 +54,25 @@ const DISCOUNT_CODE = 'JAGGY15';
 class BootScene extends Phaser.Scene {
   constructor() { super({ key:'BootScene' }); }
 
-preload() {
-  // Jaggy: spritesheet con 10 frames (0–9)
-  this.load.spritesheet(
-    'jaggy',
-    new URL('./assets/jaggy_sheet.png', import.meta.url).href,
-    {
+  preload() {
+    // Jaggy: spritesheet con 10 frames (0–9)
+    this.load.spritesheet('jaggy', jaggySheet, {
       frameWidth: JAGGY_FW,
       frameHeight: JAGGY_FH,
-    }
-  );
+    });
 
-  // Alien
-  this.load.spritesheet(
-    'alien',
-    new URL('./assets/alien_sheet.png', import.meta.url).href,
-    {
+    // Alien
+    this.load.spritesheet('alien', alienSheet, {
       frameWidth: ALIEN_FW,
       frameHeight: ALIEN_FH,
-    }
-  );
+    });
 
-  // Burger
-  this.load.spritesheet(
-    'burger',
-    new URL('./assets/burger_sheet.png', import.meta.url).href,
-    {
+    // Burger
+    this.load.spritesheet('burger', burgerSheet, {
       frameWidth: BURGER_FW,
       frameHeight: BURGER_FH,
-    }
-  );
-}
+    });
+  }
 
   create() {
     this._genEnvAssets();
