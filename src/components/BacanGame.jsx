@@ -15,8 +15,8 @@ const GW = 480;
 const GH = 270;
 
 // ─── Spritesheets ─────────────────────────────────────────────────────────────
-// Jaggy: 10 frames horizontales en jaggy_sheet.png (1024×127) → ~25–30px alto
-const JAGGY_FW    = 290;   // 1024 / 10 frames ≈ 102px por frame
+// 
+const JAGGY_FW    = 290;   // 
 const JAGGY_FH    = 360;
 const JAGGY_SCALE = 0.09;  // ajustado para tamaño cómodo en mobile
 
@@ -56,7 +56,7 @@ class BootScene extends Phaser.Scene {
 
   preload() {
     // Jaggy: spritesheet con 10 frames (0–9)
-    this.load.spritesheet('jaggy', jaggySheet, {
+    this.load.spritesheet('jaggy', jaggySheet, + Date.now(), {
       frameWidth: JAGGY_FW,
       frameHeight: JAGGY_FH,
     });
@@ -74,11 +74,13 @@ class BootScene extends Phaser.Scene {
     });
   }
 
-  create() {
-    this._genEnvAssets();
-    this._registerAnims();
-    this.scene.start('GameScene', { levelIndex:0, totalScore:0 });
-  }
+   create() {
+  this._genEnvAssets();
+  this._registerAnims();
+  console.log('¿Existe jaggy_idle?', this.anims.exists('jaggy_idle'));
+  console.log([...this.anims.anims.keys()]);
+  this.scene.start('GameScene', { levelIndex:0, totalScore:0 });
+   }
 
   // Solo genera texturas de entorno (tiles, árboles, nubes, portal)
   // alien y burger vienen de sus spritesheets — NO se tocan acá
@@ -203,6 +205,10 @@ class GameScene extends Phaser.Scene {
     this._buildBG(WW);
     this._buildLevel(WW);
     this._buildPlayer();
+
+      console.log('Textura del player:', this.player.texture.key);
+  console.log('Frame actual:', this.player.frame.name);
+
     this._buildAliens();
     this._buildBurgers();
     this._buildPortal(WW);
