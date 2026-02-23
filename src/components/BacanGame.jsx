@@ -306,14 +306,12 @@ class GameScene extends Phaser.Scene {
   _buildBurgers() {
     this.burgers = this.physics.add.staticGroup();
 
-    // Burgers: en plataformas + a nivel suelo para obligar a bajar
+    // Burgers: pocas arriba (3) + varias a nivel suelo para obligar a bajar
     const pos = [
-      // sobre plataformas
-      [46,GH-56],[124,GH-74],[208,GH-58],[294,GH-76],
-      [378,GH-60],[464,GH-78],[548,GH-62],[634,GH-76],
-      [718,GH-60],[804,GH-78],[888,GH-62],[974,GH-76],
-      [1058,GH-60],[1144,GH-78],[1228,GH-62],[1314,GH-76],
-      [1398,GH-60],
+      // solo 3 arriba de plataformas (inicio, medio, casi meta)
+      [124,GH-74],
+      [718,GH-60],
+      [1228,GH-62],
       // a nivel suelo (un poco más arriba del piso físico)
       [90,GH-24],[230,GH-24],[370,GH-24],[510,GH-24],
       [650,GH-24],[790,GH-24],[930,GH-24],[1070,GH-24],
@@ -408,7 +406,7 @@ class GameScene extends Phaser.Scene {
     if (burger.body) burger.body.enable = false;
 
     burger.anims.play('burger_collect');
-    this.time.delayedCall(180, ()=>{ if(burger?.active) burger.destroy(); });
+    this.time.delayedCall(180, ()=>{ burger.destroy(); });
     this.burgerCount++;
     this.totalScore += 1;
     this.hudBurger.setText(`🍔 ${this.burgerCount}/${this.lvl.burgerGoal}`);
@@ -418,8 +416,17 @@ class GameScene extends Phaser.Scene {
       color:'#FAB910', stroke:'#000', strokeThickness:2,
     }).setDepth(30).setOrigin(0.5);
     this.tweens.add({ targets:pop, y:pop.y-22, alpha:0, duration:700, onComplete:()=>pop.destroy() });
-    // Destello más suave al recoger burger
-    this.cameras.main.flash(35,230,200,120,false);
+
+    // Efecto sutil: halo alrededor del jugador en vez de pantallazo
+    const halo = this.add.circle(player.x, player.y-18, 10, 0xFAB910, 0.4)
+      .setDepth(29);
+    this.tweens.add({
+      targets: halo,
+      scale: 1.8,
+      alpha: 0,
+      duration: 220,
+      onComplete: () => halo.destroy(),
+    });
   }
 
   _onAlien(player, alien) {
