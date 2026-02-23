@@ -52,15 +52,37 @@ const DISCOUNT_CODE = 'JAGGY15';
 class BootScene extends Phaser.Scene {
   constructor() { super({ key:'BootScene' }); }
 
-  preload() {
-    // Jaggy: spritesheet con 10 frames (0–9)
-    this.load.spritesheet('jaggy',  'assets/jaggy_sheet.png',  {
-      frameWidth:  JAGGY_FW,
+preload() {
+  // Jaggy: spritesheet con 10 frames (0–9)
+  this.load.spritesheet(
+    'jaggy',
+    new URL('./assets/jaggy_sheet.png', import.meta.url).href,
+    {
+      frameWidth: JAGGY_FW,
       frameHeight: JAGGY_FH,
-    });
-    this.load.spritesheet('alien',  'assets/alien_sheet.png',  { frameWidth: ALIEN_FW,  frameHeight: ALIEN_FH  });
-    this.load.spritesheet('burger', 'assets/burger_sheet.png', { frameWidth: BURGER_FW, frameHeight: BURGER_FH });
-  }
+    }
+  );
+
+  // Alien
+  this.load.spritesheet(
+    'alien',
+    new URL('./assets/alien_sheet.png', import.meta.url).href,
+    {
+      frameWidth: ALIEN_FW,
+      frameHeight: ALIEN_FH,
+    }
+  );
+
+  // Burger
+  this.load.spritesheet(
+    'burger',
+    new URL('./assets/burger_sheet.png', import.meta.url).href,
+    {
+      frameWidth: BURGER_FW,
+      frameHeight: BURGER_FH,
+    }
+  );
+}
 
   create() {
     this._genEnvAssets();
