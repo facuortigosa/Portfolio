@@ -41,12 +41,12 @@ const WALK_SPD   = 140;
 const X_SCALE = 1.3;
 // ─── Niveles ─────────────────────────────────────────────────────────────────
 const LEVELS = [
-  { num:1, label:'SELVA',       time:60, aliens:3, alienSpd:45, burgerGoal:3, bgTop:0x0a1f0a, bgBot:0x1a3d0f },
+  { num:1, label:'JUNGLA',       time:60, aliens:3, alienSpd:45, burgerGoal:3, bgTop:0x0a1f0a, bgBot:0x1a3d0f },
   { num:2, label:'OSCURIDAD', time:40, aliens:5, alienSpd:65, burgerGoal:5, bgTop:0x050f18, bgBot:0x0a2035 },
   { num:3, label:'INFIERNO',    time:30, aliens:9, alienSpd:88, burgerGoal:9, bgTop:0x1a0500, bgBot:0x3d0f00 },
 ];
 
-const DISCOUNT_CODE = 'JAGGY15';
+const DISCOUNT_CODE = 'JAGGY20';
 
 // ════════════════════════════════════════════════════════════════════════════
 // BOOT SCENE
@@ -56,7 +56,7 @@ class BootScene extends Phaser.Scene {
 
   preload() {
     // Jaggy: spritesheet con 10 frames (0–9)
-    this.load.spritesheet('jaggy', jaggySheet, + Date.now(), {
+    this.load.spritesheet('jaggy', jaggySheet, {
       frameWidth: JAGGY_FW,
       frameHeight: JAGGY_FH,
     });
@@ -607,7 +607,7 @@ class WinScene extends Phaser.Scene {
     T(172,'🍔 TU DESCUENTO',6,'#aaffaa');
     const ct=T(192,DISCOUNT_CODE,16,'#FAB910');
     this.tweens.add({targets:ct,scaleX:1.06,scaleY:1.06,duration:500,yoyo:true,repeat:-1});
-    T(215,'15% OFF en Bacan',6,'#ffffff');
+    T(215,'20% OFF en Bacan',6,'#ffffff');
     T(228,'Mostrá esta pantalla 🔥',5,'#f97316');
 
     // Botón
@@ -748,7 +748,7 @@ export default function BacanGame() {
           <span>🍔</span>
           <span style={S.couponTxt}>¡GANASTE! Código: </span>
           <strong style={S.couponCode}>{ui.code}</strong>
-          <span style={S.couponTxt}> — 15% OFF</span>
+          <span style={S.couponTxt}> — 20% OFF</span>
         </div>
       )}
 
