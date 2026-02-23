@@ -23,7 +23,7 @@ const sampleProjects = [
 
   {
     title: 'BACAN STREET FOOD',
-    desc: 'Jueguito',
+    desc: 'JUEGO',
     link: 'https://facuortigosa.com/BacanGame ',
     className: 'project-card--bacan'
   }
