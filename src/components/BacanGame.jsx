@@ -44,7 +44,7 @@ const LEVELS = [
   { num:3, label:'INFIERNO',    time:20, aliens:9, alienSpd:88, burgerGoal:9, bgTop:0x1a0500, bgBot:0x3d0f00 },
 ];
 
-const DISCOUNT_CODE = 'JAGGY20';
+const DISCOUNT_CODE = 'JAGGY15';
 
 // ════════════════════════════════════════════════════════════════════════════
 // BOOT SCENE
@@ -402,6 +402,11 @@ class GameScene extends Phaser.Scene {
   }
 
   _onBurger(player, burger) {
+    // Evita contar múltiples veces la misma burger si el overlap se dispara repetido
+    if (!burger.active) return;
+    burger.setActive(false);
+    if (burger.body) burger.body.enable = false;
+
     burger.anims.play('burger_collect');
     this.time.delayedCall(180, ()=>{ if(burger?.active) burger.destroy(); });
     this.burgerCount++;
@@ -413,7 +418,8 @@ class GameScene extends Phaser.Scene {
       color:'#FAB910', stroke:'#000', strokeThickness:2,
     }).setDepth(30).setOrigin(0.5);
     this.tweens.add({ targets:pop, y:pop.y-22, alpha:0, duration:700, onComplete:()=>pop.destroy() });
-    this.cameras.main.flash(50,255,200,0,false);
+    // Destello más suave al recoger burger
+    this.cameras.main.flash(35,230,200,120,false);
   }
 
   _onAlien(player, alien) {
@@ -497,6 +503,13 @@ class GameScene extends Phaser.Scene {
   _patrolAliens() {
     const spd = this.lvl.alienSpd;
     this.aliens.getChildren().forEach(a=>{
+      if (!a.body) return;
+
+      // Si por alguna razón quedó parado, volvemos a darle velocidad
+      if (a.body.velocity.x === 0) {
+        a.setVelocityX(spd);
+      }
+
       if      (a.x>=a.patrolRight) { a.setVelocityX(-spd); a.setFlipX(true);  }
       else if (a.x<=a.patrolLeft)  { a.setVelocityX( spd); a.setFlipX(false); }
     });
@@ -543,7 +556,7 @@ class WinScene extends Phaser.Scene {
     T(172,'🍔 TU DESCUENTO',6,'#aaffaa');
     const ct=T(192,DISCOUNT_CODE,16,'#FAB910');
     this.tweens.add({targets:ct,scaleX:1.06,scaleY:1.06,duration:500,yoyo:true,repeat:-1});
-    T(215,'20% OFF en Bacan',6,'#ffffff');
+    T(215,'15% OFF en Bacan',6,'#ffffff');
     T(228,'Mostrá esta pantalla 🔥',5,'#f97316');
 
     // Botón
@@ -684,7 +697,7 @@ export default function BacanGame() {
           <span>🍔</span>
           <span style={S.couponTxt}>¡GANASTE! Código: </span>
           <strong style={S.couponCode}>{ui.code}</strong>
-          <span style={S.couponTxt}> — 20% OFF</span>
+          <span style={S.couponTxt}> — 15% OFF</span>
         </div>
       )}
 
