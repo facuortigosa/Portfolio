@@ -1,13 +1,6 @@
 /**
  * BacanGame.jsx  —  Bacan Jungle Run  🍔
- *
- * SETUP:
- *   1. npm install phaser react-router-dom
- *   2. /public/assets/jaggy_sheet.png   (290×360 × 10 frames)
- *   3. /public/assets/alien_sheet.png   (160×192 × 4 frames)
- *   4. /public/assets/burger_sheet.png  (128×112 × 4 frames)
- *   5. index.html <head>:
- *      <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
+ * 
  */
 
 import Phaser from 'phaser';
@@ -46,9 +39,9 @@ const WALK_SPD   = 140;
 const X_SCALE = 1.3;
 // ─── Niveles ─────────────────────────────────────────────────────────────────
 const LEVELS = [
-  { num:1, label:'SELVA',       time:70, aliens:3, alienSpd:50, burgerGoal:4, bgTop:0x0a1f0a, bgBot:0x1a3d0f },
-  { num:2, label:'PROFUNDIDAD', time:60, aliens:5, alienSpd:70, burgerGoal:6, bgTop:0x050f18, bgBot:0x0a2035 },
-  { num:3, label:'INFIERNO',    time:50, aliens:7, alienSpd:90, burgerGoal:8, bgTop:0x1a0500, bgBot:0x3d0f00 },
+  { num:1, label:'SELVA',       time:45, aliens:3, alienSpd:45, burgerGoal:3, bgTop:0x0a1f0a, bgBot:0x1a3d0f },
+  { num:2, label:'PROFUNDIDAD', time:30, aliens:5, alienSpd:65, burgerGoal:5, bgTop:0x050f18, bgBot:0x0a2035 },
+  { num:3, label:'INFIERNO',    time:20, aliens:9, alienSpd:88, burgerGoal:9, bgTop:0x1a0500, bgBot:0x3d0f00 },
 ];
 
 const DISCOUNT_CODE = 'JAGGY20';
@@ -169,7 +162,7 @@ class GameScene extends Phaser.Scene {
 
   create() {
     this.cameras.main.setRoundPixels(true);
-    const WW = GW * 4.5;   // mundo algo más corto para que la meta no quede tan lejos
+    const WW = GW * 4.5;   // mundo = 6 pantallas de ancho
 
     this._buildBG(WW);
     this._buildLevel(WW);
@@ -313,21 +306,22 @@ class GameScene extends Phaser.Scene {
   _buildBurgers() {
     this.burgers = this.physics.add.staticGroup();
 
-    // Una burger encima de cada plataforma + algunas abajo para obligar a bajar
+    // Burgers: en plataformas + a nivel suelo para obligar a bajar
     const pos = [
+      // sobre plataformas
       [46,GH-56],[124,GH-74],[208,GH-58],[294,GH-76],
       [378,GH-60],[464,GH-78],[548,GH-62],[634,GH-76],
       [718,GH-60],[804,GH-78],[888,GH-62],[974,GH-76],
       [1058,GH-60],[1144,GH-78],[1228,GH-62],[1314,GH-76],
       [1398,GH-60],
-      // burgers a nivel suelo para aumentar la dificultad (obliga a bajar)
+      // a nivel suelo (un poco más arriba del piso físico)
       [90,GH-24],[230,GH-24],[370,GH-24],[510,GH-24],
       [650,GH-24],[790,GH-24],[930,GH-24],[1070,GH-24],
       [1210,GH-24],[1350,GH-24],
     ];
 
     // Usamos X_SCALE también aquí para alinear con las nuevas plataformas
-    pos.forEach(([x,y],i) => {
+    pos.forEach(([x,y]) => {
       const sx = x * X_SCALE;
       const b = this.burgers.create(sx, y, 'burger', 0);
       b.setDepth(4).setScale(BURGER_SCALE);
@@ -459,7 +453,6 @@ class GameScene extends Phaser.Scene {
     this.cameras.main.shake(180,0.014);
     this.cameras.main.flash(100,220,30,30);
     this.time.delayedCall(320,()=>{
-      // Reinicia la partida desde el nivel 1 y resetea score en el UI
       this.game.events.emit('restartGame');
       this.scene.start('BootScene');
     });
