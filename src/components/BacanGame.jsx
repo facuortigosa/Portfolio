@@ -53,7 +53,8 @@ class BootScene extends Phaser.Scene {
   constructor() { super({ key:'BootScene' }); }
 
   preload() {
-    this.load.spritesheet('jaggy',  'assets/jaggy_sheet.png',  { frameWidth: JAGGY_FW,  frameHeight: JAGGY_FH  });
+    // Jaggy se usa como un solo frame (no spritesheet) para evitar problemas de dimensiones
+    this.load.image('jaggy',  'assets/jaggy_sheet.png');
     this.load.spritesheet('alien',  'assets/alien_sheet.png',  { frameWidth: ALIEN_FW,  frameHeight: ALIEN_FH  });
     this.load.spritesheet('burger', 'assets/burger_sheet.png', { frameWidth: BURGER_FW, frameHeight: BURGER_FH });
   }
@@ -114,15 +115,15 @@ class BootScene extends Phaser.Scene {
   }
 
   _registerAnims() {
-    // ── Jaggy ──
+    // ── Jaggy ── (un solo frame: usamos la misma imagen para idle/walk/jump/win)
     if (!this.anims.exists('jaggy_idle'))
-      this.anims.create({ key:'jaggy_idle', frames:[{key:'jaggy',frame:0}], frameRate:2, repeat:-1 });
+      this.anims.create({ key:'jaggy_idle', frames:[{key:'jaggy'}], frameRate:2, repeat:-1 });
     if (!this.anims.exists('jaggy_walk'))
-      this.anims.create({ key:'jaggy_walk', frames:this.anims.generateFrameNumbers('jaggy',{frames:[1,2,3,4,5,6]}), frameRate:10, repeat:-1 });
+      this.anims.create({ key:'jaggy_walk', frames:[{key:'jaggy'}], frameRate:6, repeat:-1 });
     if (!this.anims.exists('jaggy_jump'))
-      this.anims.create({ key:'jaggy_jump', frames:this.anims.generateFrameNumbers('jaggy',{frames:[7,8]}), frameRate:6, repeat:0 });
+      this.anims.create({ key:'jaggy_jump', frames:[{key:'jaggy'}], frameRate:1, repeat:0 });
     if (!this.anims.exists('jaggy_win'))
-      this.anims.create({ key:'jaggy_win', frames:[{key:'jaggy',frame:9}], frameRate:1, repeat:0 });
+      this.anims.create({ key:'jaggy_win', frames:[{key:'jaggy'}], frameRate:1, repeat:0 });
 
     // ── Alien ── (key: 'alien', 0=idle 1=walk_a 2=walk_b 3=hurt)
     if (!this.anims.exists('alien_idle'))
