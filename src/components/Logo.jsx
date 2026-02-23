@@ -1,9 +1,11 @@
 export default function Logo() {
   return (
-<svg xmlns="http://www.w3.org/2000/svg" width="300" height="120" viewBox="0 0 430 120">
-  <circle cx="60" cy="60" r="30" stroke="#6b6b6b" stroke-width="8" fill="none"/>
-  <circle cx="60" cy="60" r="12" fill="#6b6b6b"/>
-  <text x="120" y="70" font-size="32" fill="#4e4e4e" letter-spacing="6">facuortigosa</text>
-</svg>
-    );  
+    <svg xmlns="http://www.w3.org/2000/svg" width="300" height="120" viewBox="0 0 430 120">
+      <circle cx="60" cy="60" r="30" stroke="#6b6b6b" strokeWidth="8" fill="none" />
+      <circle cx="60" cy="60" r="12" fill="#6b6b6b" />
+      <text x="120" y="70" fontSize="32" fill="#4e4e4e" letterSpacing="6">
+        facuortigosa
+      </text>
+    </svg>
+  );
 }

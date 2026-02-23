@@ -20,20 +20,20 @@ const GW = 480;
 const GH = 270;
 
 // ─── Spritesheets ─────────────────────────────────────────────────────────────
-// Jaggy: 290×360 por frame → se muestra a ~26px de alto
+// Jaggy: 290×360 por frame → se muestra a ~30px de alto aprox (mobile first)
 const JAGGY_FW    = 290;
 const JAGGY_FH    = 360;
-const JAGGY_SCALE = 0.072;   // ~26px alto — proporcional a plataformas 16px
+const JAGGY_SCALE = 0.09;   // un poco más grande para mobile
 
-// Alien: 160×192 por frame → se muestra a ~22px de alto
+// Alien: 160×192 por frame → se muestra a ~24px de alto
 const ALIEN_FW    = 160;
 const ALIEN_FH    = 192;
-const ALIEN_SCALE = 0.115;   // ~22px alto
+const ALIEN_SCALE = 0.135;   // algo más grande para que se vean mejor
 
-// Burger: 128×112 por frame → se muestra a ~10px de alto
+// Burger: 128×112 por frame → se muestra a ~11–12px de alto
 const BURGER_FW    = 128;
 const BURGER_FH    = 112;
-const BURGER_SCALE = 0.09;   // ~10px alto
+const BURGER_SCALE = 0.11;   // acompaña el nuevo tamaño general
 
 // ─── Física ──────────────────────────────────────────────────────────────────
 const GRAVITY    = 900;
@@ -41,11 +41,14 @@ const JUMP_VEL   = -390;
 const FALL_BOOST = 400;
 const WALK_SPD   = 140;
 
+// ─── Escala horizontal de nivel ─────────────────────────────────────────────
+// Factor >1 separa más plataformas, aliens y burgers sin cambiar el tamaño de la cámara.
+const X_SCALE = 1.3;
 // ─── Niveles ─────────────────────────────────────────────────────────────────
 const LEVELS = [
-  { num:1, label:'SELVA',       time:90, aliens:3, alienSpd:45, burgerGoal:3, bgTop:0x0a1f0a, bgBot:0x1a3d0f },
-  { num:2, label:'PROFUNDIDAD', time:70, aliens:5, alienSpd:65, burgerGoal:5, bgTop:0x050f18, bgBot:0x0a2035 },
-  { num:3, label:'INFIERNO',    time:55, aliens:7, alienSpd:88, burgerGoal:7, bgTop:0x1a0500, bgBot:0x3d0f00 },
+  { num:1, label:'SELVA',       time:70, aliens:3, alienSpd:50, burgerGoal:4, bgTop:0x0a1f0a, bgBot:0x1a3d0f },
+  { num:2, label:'PROFUNDIDAD', time:60, aliens:5, alienSpd:70, burgerGoal:6, bgTop:0x050f18, bgBot:0x0a2035 },
+  { num:3, label:'INFIERNO',    time:50, aliens:7, alienSpd:90, burgerGoal:8, bgTop:0x1a0500, bgBot:0x3d0f00 },
 ];
 
 const DISCOUNT_CODE = 'JAGGY20';
@@ -166,7 +169,7 @@ class GameScene extends Phaser.Scene {
 
   create() {
     this.cameras.main.setRoundPixels(true);
-    const WW = GW * 6;   // mundo = 6 pantallas de ancho
+    const WW = GW * 4.5;   // mundo algo más corto para que la meta no quede tan lejos
 
     this._buildBG(WW);
     this._buildLevel(WW);
@@ -244,7 +247,7 @@ class GameScene extends Phaser.Scene {
     this.platforms.add(gnd);
 
     // Plataformas: [x_inicio, y, num_tiles]
-    // Espaciado pensado para que Jaggy (~48px) pueda saltar entre ellas
+    // Espaciado pensado para que Jaggy pueda saltar entre ellas — X_SCALE abre más la distancia.
     const defs = [
       [30,  GH-44, 5], [110, GH-62, 4], [195, GH-46, 5],
       [280, GH-64, 4], [365, GH-48, 5], [450, GH-66, 4],
@@ -255,8 +258,9 @@ class GameScene extends Phaser.Scene {
     ];
 
     defs.forEach(([xs,y,tc]) => {
+      const baseX = xs * X_SCALE;
       for (let i=0;i<tc;i++) {
-        const t = this.add.image(xs+i*16+8, y,'plat_tile').setDepth(3);
+        const t = this.add.image(baseX + i*16*X_SCALE + 8, y,'plat_tile').setDepth(3);
         this.physics.add.existing(t,true);
         this.platforms.add(t);
       }
@@ -288,15 +292,19 @@ class GameScene extends Phaser.Scene {
       {x:1058,y:GH-40, l:1038,r:1118},
     ];
 
+    // Aplicamos X_SCALE para que las patrullas queden más separadas
     slots.slice(0, this.lvl.aliens).forEach(({x,y,l,r}) => {
-      const a = this.aliens.create(x, y, 'alien', 0);
+      const sx = x * X_SCALE;
+      const sl = l * X_SCALE;
+      const sr = r * X_SCALE;
+      const a = this.aliens.create(sx, y, 'alien', 0);
       a.setDepth(4).setOrigin(0.5,1).setScale(ALIEN_SCALE);
       // Hitbox: cuerpo visible del alien
       a.setBodySize(ALIEN_FW*0.55, ALIEN_FH*0.70);
       a.setOffset(ALIEN_FW*0.225, ALIEN_FH*0.22);
       a.setCollideWorldBounds(false);
       a.setVelocityX(this.lvl.alienSpd);
-      a.patrolLeft=l; a.patrolRight=r;
+      a.patrolLeft=sl; a.patrolRight=sr;
       a.anims.play('alien_walk');
     });
   }
@@ -305,20 +313,27 @@ class GameScene extends Phaser.Scene {
   _buildBurgers() {
     this.burgers = this.physics.add.staticGroup();
 
-    // Una burger encima de cada plataforma
+    // Una burger encima de cada plataforma + algunas abajo para obligar a bajar
     const pos = [
       [46,GH-56],[124,GH-74],[208,GH-58],[294,GH-76],
       [378,GH-60],[464,GH-78],[548,GH-62],[634,GH-76],
       [718,GH-60],[804,GH-78],[888,GH-62],[974,GH-76],
       [1058,GH-60],[1144,GH-78],[1228,GH-62],[1314,GH-76],
       [1398,GH-60],
+      // burgers a nivel suelo para aumentar la dificultad (obliga a bajar)
+      [90,GH-24],[230,GH-24],[370,GH-24],[510,GH-24],
+      [650,GH-24],[790,GH-24],[930,GH-24],[1070,GH-24],
+      [1210,GH-24],[1350,GH-24],
     ];
 
+    // Usamos X_SCALE también aquí para alinear con las nuevas plataformas
     pos.forEach(([x,y],i) => {
-      const b = this.burgers.create(x, y, 'burger', 0);
+      const sx = x * X_SCALE;
+      const b = this.burgers.create(sx, y, 'burger', 0);
       b.setDepth(4).setScale(BURGER_SCALE);
-      b.setBodySize(BURGER_FW*0.65, BURGER_FH*0.55);
-      b.setOffset(BURGER_FW*0.175, BURGER_FH*0.25);
+      // Hitbox más pequeño y centrado para que no se recojan "a distancia"
+      b.setBodySize(BURGER_FW*0.45, BURGER_FH*0.40);
+      b.setOffset(BURGER_FW*0.275, BURGER_FH*0.30);
       b.anims.play('burger_float');
     });
   }
@@ -396,10 +411,10 @@ class GameScene extends Phaser.Scene {
     burger.anims.play('burger_collect');
     this.time.delayedCall(180, ()=>{ if(burger?.active) burger.destroy(); });
     this.burgerCount++;
-    this.totalScore += 10;
+    this.totalScore += 1;
     this.hudBurger.setText(`🍔 ${this.burgerCount}/${this.lvl.burgerGoal}`);
     this.game.events.emit('scoreUpdate', this.totalScore);
-    const pop = this.add.text(player.x, player.y-14, '+10', {
+    const pop = this.add.text(player.x, player.y-14, '+1', {
       fontSize:'7px', fontFamily:'"Press Start 2P",monospace',
       color:'#FAB910', stroke:'#000', strokeThickness:2,
     }).setDepth(30).setOrigin(0.5);
@@ -444,11 +459,9 @@ class GameScene extends Phaser.Scene {
     this.cameras.main.shake(180,0.014);
     this.cameras.main.flash(100,220,30,30);
     this.time.delayedCall(320,()=>{
-      this.game.events.emit('playerHit');
-      this.player.setPosition(32,GH-60);
-      this.player.setVelocity(0,0);
-      this.player.anims.play('jaggy_idle');
-      this._dead = false;
+      // Reinicia la partida desde el nivel 1 y resetea score en el UI
+      this.game.events.emit('restartGame');
+      this.scene.start('BootScene');
     });
   }
 
@@ -691,7 +704,7 @@ export default function BacanGame() {
 // ════════════════════════════════════════════════════════════════════════════
 const S = {
   page:{
-    display:'flex',flexDirection:'column',alignItems:'center',
+    display:'flex',flexDirection:'column',alignItems:'stretch',
     minHeight:'100dvh',background:'#050a05',
     fontFamily:'"Press Start 2P","Courier New",monospace',
     userSelect:'none',WebkitUserSelect:'none',overscrollBehavior:'none',
@@ -731,8 +744,12 @@ const S = {
   lvlGoal:{fontSize:'6px',color:'#FAB910'},
 
   canvas:{
-    position:'relative',width:'100%',maxWidth:'520px',
-    background:'#050a05',overflow:'hidden',
+    position:'relative',
+    width:'100%',
+    maxWidth:'100%',
+    flex:1,
+    background:'#050a05',
+    overflow:'hidden',
     aspectRatio:`${GW}/${GH}`,
     imageRendering:'pixelated',
   },
