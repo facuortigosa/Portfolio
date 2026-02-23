@@ -2,12 +2,12 @@
  * BacanGame.jsx  —  Bacan Jungle Run  🍔
  * 
  */
-import jaggySheet from '../assets/jaggy_sheet.png';
-import alienSheet from '../assets/alien_sheet.png';
-import burgerSheet from '../assets/burger_sheet.png';
 import Phaser from 'phaser';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import jaggySheet from '../assets/jaggy_sheet.png';
+import alienSheet from '../assets/alien_sheet.png';
+import burgerSheet from '../assets/burger_sheet.png';
 
 // ─── Resolución interna ───────────────────────────────────────────────────────
 // 480×270 = 16:9, suficiente espacio para que todo se vea proporcional
@@ -15,10 +15,10 @@ const GW = 480;
 const GH = 270;
 
 // ─── Spritesheets ─────────────────────────────────────────────────────────────
-// Jaggy: 290×360 por frame → se muestra a ~30px de alto aprox (mobile first)
-const JAGGY_FW    = 290;
+// Jaggy: 10 frames horizontales en jaggy_sheet.png (1024×127) → ~25–30px alto
+const JAGGY_FW    = 290;   // 1024 / 10 frames ≈ 102px por frame
 const JAGGY_FH    = 360;
-const JAGGY_SCALE = 0.09;   // un poco más grande para mobile
+const JAGGY_SCALE = 0.09;  // ajustado para tamaño cómodo en mobile
 
 // Alien: 160×192 por frame → se muestra a ~24px de alto
 const ALIEN_FW    = 160;
@@ -41,9 +41,9 @@ const WALK_SPD   = 140;
 const X_SCALE = 1.3;
 // ─── Niveles ─────────────────────────────────────────────────────────────────
 const LEVELS = [
-  { num:1, label:'SELVA',       time:45, aliens:3, alienSpd:45, burgerGoal:3, bgTop:0x0a1f0a, bgBot:0x1a3d0f },
-  { num:2, label:'PROFUNDIDAD', time:30, aliens:5, alienSpd:65, burgerGoal:5, bgTop:0x050f18, bgBot:0x0a2035 },
-  { num:3, label:'INFIERNO',    time:20, aliens:9, alienSpd:88, burgerGoal:9, bgTop:0x1a0500, bgBot:0x3d0f00 },
+  { num:1, label:'SELVA',       time:60, aliens:3, alienSpd:45, burgerGoal:3, bgTop:0x0a1f0a, bgBot:0x1a3d0f },
+  { num:2, label:'OSCURIDAD', time:40, aliens:5, alienSpd:65, burgerGoal:5, bgTop:0x050f18, bgBot:0x0a2035 },
+  { num:3, label:'INFIERNO',    time:30, aliens:9, alienSpd:88, burgerGoal:9, bgTop:0x1a0500, bgBot:0x3d0f00 },
 ];
 
 const DISCOUNT_CODE = 'JAGGY15';
@@ -319,6 +319,8 @@ class GameScene extends Phaser.Scene {
       {x:718, y:GH-40, l:700, r:775},
       {x:878, y:GH-40, l:860, r:940},
       {x:1058,y:GH-40, l:1038,r:1118},
+      {x:1228,y:GH-40, l:1208,r:1288},
+      {x:1398,y:GH-40, l:1378,r:1458},
     ];
 
     // Aplicamos X_SCALE para que las patrullas queden más separadas
