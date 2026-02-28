@@ -32,7 +32,7 @@ export default function App() {
       <Routes>
         <Route path="/"          element={<Portfolio />} />
         <Route path="/bacanjunglerun" element={<bacanjunglerun />} />
-        <Route path="/proyectoq" element={<proyecto-q />} />
+        <Route path="/proyectoq" element={<proyectoq />} />
       </Routes>
     </BrowserRouter>
   )
