@@ -4,7 +4,7 @@ const sampleProjects = [
   {
     title: 'AUDITORIO Q',
     desc: '',
-    link: 'https://auditorio-q-1itxecsf4bhu3bth.builder-preview.com/',
+    link: 'https://facuortigosa.com/proyectoq',
     className: 'project-card--auditorio'
   },
   {
@@ -24,7 +24,7 @@ const sampleProjects = [
   {
     title: 'BACAN STREET FOOD',
     desc: 'JUEGO',
-    link: 'https://facuortigosa.com/BacanGame ',
+    link: 'https://facuortigosa.com/bacanjunglerun',
     className: 'project-card--bacan'
   }
 
