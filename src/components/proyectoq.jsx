@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 const FONT_LINK =
   "https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap";
 
-const TICKET_URL = "https://www.passline.com/eventos/proyecto-caserio-primera-dosis-del-ano?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnHnBPJRsPgN09zWvmY3H_7OVxX6w_FgmZL3JmQ1HS5P7Pc3DW5WIEInFTvLk_aem_gsrrl7DEC5BziaawPfWpqA";
+const TICKET_URL = "https://www.passline.com/eventos/4niversario?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnO1sbfYY13V-BsN8Wy_Y4jAT9Wd4dFMYPmGiZj6kgvm9qvnMsS_NamJjSzDU_aem_27WP8pABx-5zn3_BUrZ8EQ";
 
 // ─── PALETTE ──────────────────────────────────────────────────────────────────
 const C = {
@@ -660,7 +660,7 @@ function drawVictory(ctx, t, victoryTs) {
 
   ctx.font = `9px 'Share Tech Mono', monospace`;
   ctx.fillStyle = `rgba(0,255,136,0.45)`;
-  ctx.fillText("passline.com / proyecto caserio", W / 2, boxY + 30);
+  ctx.fillText("passline.com / 4NIVERSARIQ 💚", W / 2, boxY + 30);
 
   ctx.font = `bold 10px 'Orbitron', monospace`;
   ctx.fillStyle = unlocked
