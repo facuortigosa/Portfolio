@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>facuortigosa.art</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Chewy&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --rojo:#FF0033;
+  --negro:#1A1A1A;
+  --blanco:#F7F5F2;
+  --gris:#6B6B6B;
+  --alt:#EEECE8;
+  --amarillo:#FFD400;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  cursor:none;
+}
+
+body{
+  font-family:'Gloria Hallelujah',cursive;
+  background:var(--negro);
+  color:var(--blanco);
+  overflow-x:hidden;
+}
+
+/* layout */
+.container{
+  display:flex;
+  flex-direction:column;
+}
+
+@media(min-width:900px){
+  .container{
+    flex-direction:row;
+    height:100vh;
+    overflow-x:auto;
+  }
+
+  section{
+    min-width:100vw;
+    height:100vh;
+  }
+}
+
+section{
+  padding:60px 20px;
+  position:relative;
+  transition:all .6s ease;
+}
+
+/* LOGO */
+.logo{
+  font-family:'Permanent Marker',cursive;
+  font-size:clamp(3rem,8vw,7rem);
+  color:var(--amarillo);
+  text-shadow:
+    4px 4px 0 var(--rojo),
+    8px 8px 0 var(--negro),
+    -3px -3px 0 var(--blanco);
+  transform:rotate(-3deg);
+  animation:glitch 1s infinite alternate;
+  cursor:pointer;
+}
+
+@keyframes glitch{
+  0%{transform:translate(0)}
+  20%{transform:translate(-3px,2px)}
+  40%{transform:translate(3px,-2px)}
+  60%{transform:translate(-2px,-3px)}
+  80%{transform:translate(2px,3px)}
+  100%{transform:translate(0)}
+}
+
+/* STICKERS */
+.sticker{
+  position:absolute;
+  padding:12px 16px;
+  font-family:'Chewy',cursive;
+  background:var(--rojo);
+  color:white;
+  box-shadow:5px 5px 0 var(--amarillo);
+  user-select:none;
+}
+
+.sticker.alt{
+  background:var(--amarillo);
+  color:black;
+  box-shadow:5px 5px 0 var(--rojo);
+}
+
+/* DECONSTRUCCION */
+.broken{
+  position:absolute !important;
+  pointer-events:none;
+  animation:fly 2s forwards;
+}
+
+@keyframes fly{
+  to{
+    transform:translate(var(--x),var(--y)) rotate(var(--r)) scale(.5);
+    opacity:0;
+  }
+}
+
+/* cursor */
+#cursor{
+  position:fixed;
+  width:20px;
+  height:20px;
+  background:var(--amarillo);
+  border-radius:50%;
+  pointer-events:none;
+  mix-blend-mode:difference;
+  z-index:9999;
+}
+
+/* pintura */
+.paint{
+  position:fixed;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--amarillo);
+  pointer-events:none;
+}
+
+/* ruido */
+#noise{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  opacity:.05;
+  pointer-events:none;
+}
+
+/* caos */
+.chaos{
+  filter:contrast(200%) saturate(200%);
+  animation:shake .2s infinite;
+}
+
+@keyframes shake{
+  0%{transform:translate(0)}
+  50%{transform:translate(2px,-2px)}
+  100%{transform:translate(-2px,2px)}
+}
+
+h2{
+  font-family:'Chewy',cursive;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="cursor"></div>
+<canvas id="noise"></canvas>
+
+<div class="container">
+
+<section>
+<div class="logo" id="logo">facuortigosa.art</div>
+
+<div class="sticker" style="top:30%;left:10%">ruido</div>
+<div class="sticker alt" style="top:60%;left:50%">explosion</div>
+<div class="sticker" style="top:70%;left:20%">fuerza</div>
+
+</section>
+
+<section>
+<h2>concepto</h2>
+<p>caos, ruido y fuerza visual sin control</p>
+</section>
+
+<section>
+<h2>tipografia</h2>
+<p>gloria hallelujah + chewy + permanent marker</p>
+</section>
+
+<section>
+<h2>color</h2>
+<p>rojo impacto, amarillo grito, negro base</p>
+</section>
+
+</div>
+
+<script>
+
+/* cursor */
+const cursor=document.getElementById('cursor');
+document.addEventListener('mousemove',e=>{
+  cursor.style.left=e.clientX+'px';
+  cursor.style.top=e.clientY+'px';
+
+  // pintar
+  const dot=document.createElement('div');
+  dot.className='paint';
+  dot.style.left=e.clientX+'px';
+  dot.style.top=e.clientY+'px';
+  document.body.appendChild(dot);
+
+  setTimeout(()=>dot.remove(),2000);
+});
+
+/* ruido */
+const canvas=document.getElementById('noise');
+const ctx=canvas.getContext('2d');
+
+function resize(){
+  canvas.width=innerWidth;
+  canvas.height=innerHeight;
+}
+resize();
+window.onresize=resize;
+
+function noise(){
+  const img=ctx.createImageData(canvas.width,canvas.height);
+  for(let i=0;i<img.data.length;i+=4){
+    let v=Math.random()*255;
+    img.data[i]=v;
+    img.data[i+1]=v;
+    img.data[i+2]=v;
+    img.data[i+3]=20;
+  }
+  ctx.putImageData(img,0,0);
+  requestAnimationFrame(noise);
+}
+noise();
+
+/* drag stickers */
+document.querySelectorAll('.sticker').forEach(el=>{
+  let x,y;
+
+  el.onmousedown=e=>{
+    x=e.offsetX;
+    y=e.offsetY;
+
+    function move(e){
+      el.style.left=e.pageX-x+'px';
+      el.style.top=e.pageY-y+'px';
+    }
+
+    document.addEventListener('mousemove',move);
+
+    document.onmouseup=()=>{
+      document.removeEventListener('mousemove',move);
+    }
+  }
+});
+
+/* EXPLOSION MODE */
+document.getElementById('logo').addEventListener('click',()=>{
+
+  document.body.classList.add('chaos');
+
+  document.querySelectorAll('section, .sticker, h2, p').forEach(el=>{
+    const rect=el.getBoundingClientRect();
+
+    const clone=el.cloneNode(true);
+    document.body.appendChild(clone);
+
+    clone.style.left=rect.left+'px';
+    clone.style.top=rect.top+'px';
+    clone.style.width=rect.width+'px';
+
+    clone.classList.add('broken');
+
+    clone.style.setProperty('--x',(Math.random()*800-400)+'px');
+    clone.style.setProperty('--y',(Math.random()*600-300)+'px');
+    clone.style.setProperty('--r',(Math.random()*720)+'deg');
+
+    el.style.opacity=0;
+  });
+
+  // glitch heavy
+  setInterval(()=>{
+    document.body.style.transform=`translate(${Math.random()*10-5}px,${Math.random()*10-5}px)`;
+  },100);
+
+});
+
+</script>
+
+</body>
+</html>
