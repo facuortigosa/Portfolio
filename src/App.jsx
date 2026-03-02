@@ -7,8 +7,8 @@ import Projects from './components/Projects.jsx'
 import Skills from './components/Skills.jsx'
 import Contact from './components/Contact.jsx'
 import Footer from './components/Footer.jsx'
-import BacanJungleRun from './components/BacanJungleRun.jsx'
-import ProyectoQ from './components/ProyectoQ.jsx'
+import BacanGame from './components/bacanjunglerun.jsx'
+import ProyectoQ from './components/proyectoq.jsx'
 
 function Portfolio() {
   return (
@@ -31,7 +31,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/"          element={<Portfolio />} />
-        <Route path="/bacanjunglerun" element={<BacanJungleRun />} />
+        <Route path="/bacanjunglerun" element={<BacanGame />} />
         <Route path="/proyectoq" element={<ProyectoQ />} />
       </Routes>
     </BrowserRouter>
