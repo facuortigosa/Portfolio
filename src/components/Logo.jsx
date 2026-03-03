@@ -4,7 +4,7 @@ export default function Logo() {
       <circle cx="60" cy="60" r="30" stroke="#6b6b6b" strokeWidth="8" fill="none" />
       <circle cx="60" cy="60" r="12" fill="#6b6b6b" />
       <text x="120" y="70" fontSize="32" fill="#4e4e4e" letterSpacing="6">
-        facuortigosa
+        
       </text>
     </svg>
   );

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BACAN STREET FOOD</title>
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@500,600,700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --violet:#532673;--violet-d:#3d1a56;--violet-l:#6b2f8f;
+  --gold:#FAB910;--gold-d:#d99e0a;
+  --black:#000000;--white:#ffffff;
+  --orange:#C55417;--green:#298C4B;--sand:#F7D58A;
+  --bg:#532673;--surface:#6b2f8f;--card:#532673;
+  --border:rgba(83,38,115,.32);
+  --font:'General Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--font);font-weight:500;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{font-family:var(--font);cursor:pointer;border:none}
+
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9998;opacity:.7}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--violet);border-radius:3px}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 5rem;background:linear-gradient(to bottom,rgba(8,0,7,.97) 0%,transparent 100%)}
+.logo{font-weight:700;font-size:1.45rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.logo sup{font-size:.52em;color:var(--orange);vertical-align:super;letter-spacing:0}
+.nav-links{display:flex;align-items:center;gap:2.5rem;list-style:none}
+.nav-links a{font-size:.65rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5);transition:color .2s}
+.nav-links a:hover{color:var(--gold)}
+.btn-nav{background:var(--gold);color:var(--black);font-size:.65rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:.55rem 1.4rem;border-radius:3px;transition:background .2s,transform .15s}
+.btn-nav:hover{background:var(--gold-d);transform:translateY(-1px)}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid rgba(83,38,115,.5);border-radius:10px;padding:2.6rem 3rem 2.2rem;width:min(530px,92vw);position:relative;transform:translateY(28px) scale(.96);transition:transform .3s}
+.overlay.open .modal{transform:translateY(0) scale(1)}
+.modal-x{position:absolute;top:1rem;right:1.3rem;background:none;color:rgba(255,255,255,.35);font-size:1.3rem;line-height:1;transition:color .2s}
+.modal-x:hover{color:var(--white)}
+.m-ey{font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.55rem}
+.m-title{font-size:2rem;font-weight:700;line-height:1.05;color:var(--white);margin-bottom:.45rem}
+.m-sub{font-size:.8rem;color:rgba(255,255,255,.38);margin-bottom:2rem}
+.city-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.city-card{display:flex;flex-direction:column;align-items:center;gap:.65rem;padding:1.8rem 1rem 1.5rem;background:var(--card);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color .2s,background .2s,transform .2s;color:var(--white)}
+.city-card:hover{border-color:var(--gold);background:rgba(250,185,16,.05);transform:translateY(-4px)}
+.city-ico{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem}
+.ico-ba{background:rgba(83,38,115,.35)}.ico-cba{background:rgba(197,84,23,.28)}
+.city-name{font-size:1.05rem;font-weight:700}
+.city-pill{font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:rgba(250,185,16,.1);border:1px solid rgba(250,185,16,.22);padding:.2rem .65rem;border-radius:20px}
+.city-hint{font-size:.63rem;color:rgba(255,255,255,.32);text-align:center;line-height:1.5}
+.m-foot{text-align:center;font-size:.63rem;color:rgba(255,255,255,.18);letter-spacing:.08em;margin-top:1.3rem}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:0 5rem;padding-top:78px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:4%;top:50%;transform:translateY(-50%);width:50vw;height:50vw;border-radius:50%;background:radial-gradient(circle,rgba(83,38,115,.25) 0%,transparent 70%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(250,185,16,.4),transparent)}
+.h-badge{display:inline-flex;align-items:center;gap:.5rem;font-size:.63rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);background:rgba(250,185,16,.08);border:1px solid rgba(250,185,16,.22);padding:.35rem 1rem;border-radius:20px;margin-bottom:1.8rem;animation:fadeUp .7s ease both}
+.h-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
+.h-title{font-size:clamp(4rem,8vw,8.5rem);font-weight:700;line-height:.88;letter-spacing:-.01em;color:var(--white);animation:fadeUp .85s .08s ease both}
+.ht-gold{color:var(--gold);display:block}
+.ht-ghost{-webkit-text-stroke:2px rgba(250,185,16,.28);color:transparent;display:block}
+.h-desc{font-size:.95rem;line-height:1.75;color:rgba(255,255,255,.45);max-width:420px;margin:2rem 0 2.8rem;animation:fadeUp .9s .18s ease both}
+.h-actions{display:flex;gap:1rem;flex-wrap:wrap;animation:fadeUp .9s .28s ease both}
+.btn-primary{background:var(--gold);color:var(--black);font-size:.65rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:1rem 2.4rem;border-radius:3px;transition:background .2s,transform .15s,box-shadow .2s}
+.btn-primary:hover{background:var(--gold-d);transform:translateY(-2px);box-shadow:0 8px 24px rgba(250,185,16,.22)}
+.btn-ghost{background:transparent;color:var(--white);font-size:.65rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:1rem 2.4rem;border-radius:3px;border:1.5px solid rgba(255,255,255,.14);transition:border-color .2s,color .2s,transform .15s}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.h-visual{display:flex;justify-content:center;align-items:center;position:relative;animation:fadeIn 1.1s .4s ease both}
+.orb{width:430px;height:430px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#3a1255 0%,#1e0630 55%,#080007 100%);display:flex;align-items:center;justify-content:center;font-size:9.5rem;position:relative;box-shadow:0 0 80px rgba(83,38,115,.4),0 0 200px rgba(83,38,115,.14),inset 0 0 60px rgba(0,0,0,.5);border:1px solid rgba(83,38,115,.4);animation:floatY 5s ease-in-out infinite}
+.orb::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(from 0deg,transparent 60%,rgba(250,185,16,.5) 78%,transparent 100%);animation:spin 10s linear infinite}
+.orb-ring{position:absolute;inset:-22px;border-radius:50%;border:1px dashed rgba(250,185,16,.1);animation:spin 28s linear infinite reverse}
+.h-stats{position:absolute;bottom:2.5rem;left:5rem;display:flex;gap:3.5rem;animation:fadeUp .9s .5s ease both}
+.sn{font-size:2.4rem;font-weight:700;color:var(--gold);line-height:1}
+.sl{font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:.2rem}
+
+/* ── MARQUEE ── */
+.mq-wrap{overflow:hidden;background:var(--violet);padding:.88rem 0}
+.mq-track{display:flex;animation:marquee 22s linear infinite;white-space:nowrap}
+.mi{font-size:.7rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--white);padding:0 2rem;flex-shrink:0}
+.ms{color:var(--gold);margin-right:.5rem}
+
+/* ── SECTIONS ── */
+.section{padding:7rem 5rem}.section-sm{padding:5rem 5rem}
+.eyebrow{font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.s-title{font-size:clamp(2.8rem,4.5vw,4.8rem);font-weight:700;line-height:.92;letter-spacing:-.01em;color:var(--white)}
+.s-title .acc{color:var(--gold)}.s-title .vio{color:#a060d0}
+
+/* ── MENU ── */
+.menu-tabs{display:flex;gap:.4rem;margin:2.8rem 0 2.2rem;border-bottom:1px solid rgba(83,38,115,.28)}
+.tab{font-size:.63rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.32);background:none;padding:.65rem 1.4rem;border-bottom:2px solid transparent;margin-bottom:-1px;border-radius:0;transition:color .2s,border-color .2s}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}.tab:hover:not(.active){color:rgba(255,255,255,.65)}
+.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+.mc{background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s}
+.mc:hover{transform:translateY(-6px);border-color:rgba(250,185,16,.32);box-shadow:0 12px 40px rgba(83,38,115,.2)}
+.mc-img{height:168px;display:flex;align-items:center;justify-content:center;font-size:4.5rem;background:linear-gradient(135deg,#1e0630 0%,#2d0d44 100%);position:relative}
+.mc-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 55%,rgba(8,0,7,.5) 100%)}
+.b-pop{position:absolute;top:.7rem;right:.7rem;z-index:2;background:var(--orange);color:var(--white);font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.22rem .6rem;border-radius:2px}
+.mc-body{padding:1.2rem 1.4rem 1.5rem}
+.mc-tag{font-size:.6rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem}
+.mc-name{font-size:1rem;font-weight:700;color:var(--white);margin-bottom:.4rem}
+.mc-desc{font-size:.8rem;color:rgba(255,255,255,.38);line-height:1.6;margin-bottom:1.1rem}
+.mc-footer{display:flex;align-items:center;justify-content:space-between}
+.mc-price{font-size:1.55rem;font-weight:700;color:var(--gold)}
+.mc-btn{background:var(--violet);color:var(--white);font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:.5rem 1.1rem;border-radius:2px;transition:background .2s}
+.mc-btn:hover{background:var(--violet-l)}
+
+/* ── ABOUT ── */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center}
+.mosaic{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;position:relative}
+.mbox{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:2rem 1.5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;font-size:2.8rem;transition:transform .2s}
+.mbox:hover{transform:scale(1.03)}.mbox:nth-child(even){margin-top:1.4rem}
+.mlbl{font-size:.58rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.28)}
+.m-ghost{position:absolute;top:-1.5rem;left:-1.5rem;font-size:9rem;font-weight:700;color:rgba(83,38,115,.07);pointer-events:none;user-select:none;line-height:1}
+.a-quote{font-size:1.7rem;font-weight:700;color:var(--gold);line-height:1.15;margin:1.5rem 0;border-left:3px solid var(--violet);padding-left:1.2rem}
+.a-text{font-size:.95rem;color:rgba(255,255,255,.42);line-height:1.8;margin-bottom:1rem}
+
+/* ── FEATURES ── */
+.feat-bg{background:var(--surface);border-top:1px solid rgba(83,38,115,.18);border-bottom:1px solid rgba(83,38,115,.18)}
+.feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(83,38,115,.22);border:1px solid rgba(83,38,115,.22);margin-top:4rem}
+.fi{background:var(--surface);padding:2.5rem 1.8rem;text-align:center;transition:background .2s}.fi:hover{background:var(--card)}
+.fi-ico{font-size:2.3rem;margin-bottom:1rem}.fi-title{font-size:.9rem;font-weight:700;color:var(--white);margin-bottom:.5rem}.fi-desc{font-size:.78rem;color:rgba(255,255,255,.35);line-height:1.6}
+
+/* ── TESTIMONIALS ── */
+.t-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:3.5rem}
+.t-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:2rem;transition:border-color .2s,transform .2s}
+.t-card:hover{border-color:rgba(250,185,16,.22);transform:translateY(-4px)}
+.t-stars{color:var(--gold);font-size:.88rem;letter-spacing:.06em;margin-bottom:.9rem}
+.t-text{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.55);margin-bottom:1.4rem;font-style:italic}
+.t-author{display:flex;align-items:center;gap:.8rem}
+.t-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0}
+.av1{background:linear-gradient(135deg,var(--violet),var(--violet-l));color:var(--white)}
+.av2{background:linear-gradient(135deg,var(--gold),var(--sand));color:var(--black)}
+.av3{background:linear-gradient(135deg,var(--orange),#e07a3a);color:var(--white)}
+.t-name{font-size:.82rem;font-weight:700;color:var(--white)}.t-handle{font-size:.68rem;color:rgba(255,255,255,.28)}
+
+/* ── LOCATION ── */
+.loc-bg{background:var(--surface)}
+.loc-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;margin-top:4rem}
+.loc-map{background:var(--card);border:1px solid var(--border);border-radius:6px;height:380px;display:flex;align-items:center;justify-content:center;font-size:5rem;position:relative;overflow:hidden}
+.loc-map::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(83,38,115,.055) 0px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,rgba(83,38,115,.055) 0px,transparent 1px,transparent 40px)}
+.loc-pin{position:relative;z-index:1;animation:floatY 2.5s ease-in-out infinite}
+.loc-addr{font-size:2rem;font-weight:700;color:var(--white);line-height:1.2;margin:1.2rem 0}
+.loc-item{display:flex;align-items:flex-start;gap:.9rem;padding:1.1rem 0;border-bottom:1px solid rgba(83,38,115,.18)}
+.loc-ico{font-size:1.25rem;flex-shrink:0;margin-top:.1rem}.loc-lbl{font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.2rem}.loc-val{font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.55}
+
+/* ── CTA ── */
+.cta-section{text-align:center;padding:8rem 5rem;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(83,38,115,.16) 0%,transparent 68%);pointer-events:none}
+.cta-big{font-size:clamp(3.5rem,7vw,7.5rem);font-weight:700;line-height:.9;color:var(--white);letter-spacing:-.01em;margin:1.5rem 0 2.8rem}
+.cta-big .cta-g{color:var(--gold);display:block}
+.cta-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+
+/* ── FOOTER ── */
+footer{background:var(--surface);border-top:1px solid rgba(83,38,115,.22);padding:4rem 5rem 2rem}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+.f-logo{font-size:2.2rem;font-weight:700;color:var(--gold);letter-spacing:.1em}.f-tag{font-size:.8rem;color:rgba(255,255,255,.32);line-height:1.65;margin:.6rem 0 1.5rem;max-width:230px}
+.f-soc{display:flex;gap:.7rem}
+.soc{width:36px;height:36px;border-radius:3px;border:1px solid rgba(83,38,115,.38);display:flex;align-items:center;justify-content:center;font-size:.85rem;cursor:pointer;transition:border-color .2s,background .2s}
+.soc:hover{border-color:var(--gold);background:rgba(250,185,16,.08)}
+.fc-title{font-size:.62rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1.1rem}
+.fc-links{list-style:none}.fc-links li{margin-bottom:.55rem}
+.fc-links a{font-size:.82rem;color:rgba(255,255,255,.32);transition:color .2s}.fc-links a:hover{color:var(--white)}
+.f-bottom{border-top:1px solid rgba(83,38,115,.18);padding-top:1.4rem;display:flex;align-items:center;justify-content:space-between}
+.f-copy{font-size:.72rem;color:rgba(255,255,255,.22)}.f-copy span{color:var(--gold)}
+
+/* ── ANIMACIONES ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.65)}}
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1080px){
+  nav{padding:1.1rem 2.5rem}
+  .hero{grid-template-columns:1fr;padding:0 2.5rem;padding-top:100px;text-align:center}
+  .h-visual{display:none}.h-actions{justify-content:center}.h-desc{margin:2rem auto 2.8rem}.h-stats{left:2.5rem}
+  .section,.section-sm{padding:5rem 2.5rem}
+  .menu-grid{grid-template-columns:1fr 1fr}.about-grid{grid-template-columns:1fr;gap:3rem}.mosaic{display:none}
+  .feat-grid{grid-template-columns:1fr 1fr}.t-grid{grid-template-columns:1fr}.loc-grid{grid-template-columns:1fr}.fg{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){.nav-links{display:none}.h-stats{display:none}.menu-grid,.feat-grid,.fg,.city-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ══ MODAL SELECTOR DE CIUDAD ══════════════════════════════ -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <p class="m-ey">Pedir Ahora</p>
+    <h2 class="m-title">¿Desde dónde<br>nos pedís?</h2>
+    <p class="m-sub">Elegí tu ciudad para ir al menú de tu local más cercano</p>
+    <div class="city-grid">
+      <!-- ⬇ Reemplazá estas URLs con tus links reales de MenuFudo -->
+      <a class="city-card" href="https://www.menufudo.com/bacan-buenos-aires" target="_blank" rel="noopener" onclick="closeModal()">
+        <div class="city-ico ico-ba">🏙️</div>
+        <span class="city-name">Buenos Aires</span>
+        <span class="city-pill">Disponible</span>
+        <p class="city-hint">Palermo · Villa Crespo<br>Delivery hasta 5km</p>
+      </a>
+      <a class="city-card" href="https://www.menufudo.com/bacan-cordoba" target="_blank" rel="noopener" onclick="closeModal()">
+        <div class="city-ico ico-cba">🌆</div>
+        <span class="city-name">Córdoba</span>
+        <span class="city-pill">Disponible</span>
+        <p class="city-hint">Nueva Córdoba · Güemes<br>Delivery hasta 6km</p>
+      </a>
+    </div>
+    <p class="m-foot">Pedidos a través de MenuFudo · Delivery y Takeaway</p>
+  </div>
+</div>
+
+<!-- ══ NAV ════════════════════════════════════════════════════ -->
+<nav>
+  <span class="logo">BACAN<sup>®</sup></span>
+  <ul class="nav-links">
+    <li><a href="#menu">Menú</a></li>
+    <li><a href="#nosotros">Nosotros</a></li>
+    <li><a href="#ubicacion">Ubicación</a></li>
+    <li><button class="btn-nav" onclick="openModal()">Pedir Ahora</button></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ═══════════════════════════════════════════════════ -->
+<section class="hero">
+  <div>
+    <span class="h-badge"><span class="h-dot"></span>Street Food Auténtico — Desde 2018</span>
+    <h1 class="h-title">
+      COME<br>
+      <span class="ht-gold">BIEN.</span>
+      COME<br>
+      <span class="ht-ghost">BACAN.</span>
+    </h1>
+    <p class="h-desc">Sabores callejeros con ingredientes frescos. Cada plato es una explosión de cultura, fuego y autenticidad. Hecho con amor desde la calle para vos.</p>
+    <div class="h-actions">
+      <button class="btn-primary" onclick="openModal()">🛵 Pedir Ahora</button>
+      <a href="#menu" class="btn-ghost">Ver Menú</a>
+    </div>
+  </div>
+  <div class="h-visual">
+    <div class="orb">🌮<div class="orb-ring"></div></div>
+  </div>
+  <div class="h-stats">
+    <div><div class="sn">+30K</div><div class="sl">Clientes Felices</div></div>
+    <div><div class="sn">48</div><div class="sl">Platos del Menú</div></div>
+    <div><div class="sn">4.9★</div><div class="sl">Rating Promedio</div></div>
+  </div>
+</section>
+
+<!-- ══ MARQUEE ════════════════════════════════════════════════ -->
+<div class="mq-wrap">
+  <div class="mq-track">
+    <span class="mi"><span class="ms">◆</span>TACOS CALLEJEROS</span>
+    <span class="mi"><span class="ms">◆</span>BURGERS ARTESANALES</span>
+    <span class="mi"><span class="ms">◆</span>SALSAS SECRETAS</span>
+    <span class="mi"><span class="ms">◆</span>SABOR DE BARRIO</span>
+    <span class="mi"><span class="ms">◆</span>INGREDIENTES FRESCOS</span>
+    <span class="mi"><span class="ms">◆</span>HECHO CON FUEGO</span>
+    <span class="mi"><span class="ms">◆</span>DELIVERY DISPONIBLE</span>
+    <span class="mi"><span class="ms">◆</span>TACOS CALLEJEROS</span>
+    <span class="mi"><span class="ms">◆</span>BURGERS ARTESANALES</span>
+    <span class="mi"><span class="ms">◆</span>SALSAS SECRETAS</span>
+    <span class="mi"><span class="ms">◆</span>SABOR DE BARRIO</span>
+    <span class="mi"><span class="ms">◆</span>INGREDIENTES FRESCOS</span>
+    <span class="mi"><span class="ms">◆</span>HECHO CON FUEGO</span>
+    <span class="mi"><span class="ms">◆</span>DELIVERY DISPONIBLE</span>
+  </div>
+</div>
+
+<!-- ══ MENU ═══════════════════════════════════════════════════ -->
+<section class="section" id="menu">
+  <p class="eyebrow reveal">Lo que cocinamos</p>
+  <h2 class="s-title reveal">NUESTRO<br><span class="acc">MENÚ</span></h2>
+  <div class="menu-tabs reveal">
+    <button class="tab active" onclick="setTab(this,'tacos')">Tacos</button>
+    <button class="tab" onclick="setTab(this,'burgers')">Burgers</button>
+    <button class="tab" onclick="setTab(this,'extras')">Extras</button>
+    <button class="tab" onclick="setTab(this,'bebidas')">Bebidas</button>
+  </div>
+  <div class="menu-grid" id="menu-grid"></div>
+</section>
+
+<!-- ══ ABOUT ══════════════════════════════════════════════════ -->
+<section class="section" id="nosotros">
+  <div class="about-grid">
+    <div class="mosaic reveal">
+      <div class="m-ghost">BC</div>
+      <div class="mbox">🌶️<span class="mlbl">Chiles Frescos</span></div>
+      <div class="mbox">🔥<span class="mlbl">Fuego Real</span></div>
+      <div class="mbox">🧅<span class="mlbl">De la Huerta</span></div>
+      <div class="mbox">🫙<span class="mlbl">Salsas Caseras</span></div>
+    </div>
+    <div class="reveal">
+      <p class="eyebrow">Nuestra historia</p>
+      <h2 class="s-title">EL ALMA<br><span class="vio">DE LA CALLE</span></h2>
+      <blockquote class="a-quote">"La mejor comida se hace al costado de la ruta."</blockquote>
+      <p class="a-text">BACAN nació en 2018 de un carrito en el barrio. Queríamos traer el verdadero sabor callejero: sin pretensiones, solo fuego, sazón y respeto por el ingrediente.</p>
+      <p class="a-text">Hoy somos locales en Buenos Aires y Córdoba, pero el espíritu sigue siendo el mismo de aquella primera noche bajo la lluvia.</p>
+      <button class="btn-primary" onclick="openModal()" style="margin-top:.5rem">Pedir Ahora 🛵</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ═══════════════════════════════════════════════ -->
+<section class="feat-bg section-sm">
+  <p class="eyebrow reveal">Por qué elegirnos</p>
+  <h2 class="s-title reveal">LO QUE NOS<br><span class="acc">HACE DISTINTOS</span></h2>
+  <div class="feat-grid reveal">
+    <div class="fi"><div class="fi-ico">🥩</div><div class="fi-title">Ingredientes Frescos</div><div class="fi-desc">Compramos todos los días en el mercado. Nada lleva más de 24hs en nuestra cocina.</div></div>
+    <div class="fi"><div class="fi-ico">🔥</div><div class="fi-title">Cocina en Leña</div><div class="fi-desc">El sabor ahumado real viene del fuego. Nuestra parrilla trabaja desde las 9am.</div></div>
+    <div class="fi"><div class="fi-ico">🤝</div><div class="fi-title">Producto Local</div><div class="fi-desc">Trabajamos con productores del barrio. Apoyar lo local es parte de nuestra filosofía.</div></div>
+    <div class="fi"><div class="fi-ico">⚡</div><div class="fi-title">Rápido y Caliente</div><div class="fi-desc">De la parrilla a tu mano en menos de 8 minutos. La comida fría no es opción acá.</div></div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ═══════════════════════════════════════════ -->
+<section class="section">
+  <p class="eyebrow reveal">Lo que dicen</p>
+  <h2 class="s-title reveal">CLIENTES<br><span class="acc">BACANES</span></h2>
+  <div class="t-grid">
+    <div class="t-card reveal"><div class="t-stars">★★★★★</div><p class="t-text">"Los tacos de BACAN me arruinaron para siempre. La salsa verde es simplemente otro nivel. No puedo pedir en ningún otro lugar."</p><div class="t-author"><div class="t-av av1">MR</div><div><div class="t-name">Martín Romero</div><div class="t-handle">@martinromero · Google</div></div></div></div>
+    <div class="t-card reveal"><div class="t-stars">★★★★★</div><p class="t-text">"El combo burger + papas + bebida es el mejor precio-calidad del barrio. La carne siempre jugosa. Perdí la cuenta de las veces que vine."</p><div class="t-author"><div class="t-av av2">LC</div><div><div class="t-name">Laura Costello</div><div class="t-handle">@lauracostello · Instagram</div></div></div></div>
+    <div class="t-card reveal"><div class="t-stars">★★★★★</div><p class="t-text">"Pedí delivery y llegó todo perfecto y calentito. El servicio es tan bueno como la comida. Muy recomendado para todos los que aman la comida real."</p><div class="t-author"><div class="t-av av3">FP</div><div><div class="t-name">Federico Pereira</div><div class="t-handle">@fedpereira · TripAdvisor</div></div></div></div>
+  </div>
+</section>
+
+<!-- ══ UBICACION ══════════════════════════════════════════════ -->
+<section class="loc-bg section" id="ubicacion">
+  <p class="eyebrow reveal">Encontranos</p>
+  <h2 class="s-title reveal">DÓNDE<br><span class="acc">ESTAMOS</span></h2>
+  <div class="loc-grid reveal">
+    <div class="loc-map"><span class="loc-pin">📍</span></div>
+    <div>
+      <div class="loc-addr">Buenos Aires<br>y Córdoba</div>
+      <div class="loc-item"><span class="loc-ico">🕐</span><div><div class="loc-lbl">Horarios</div><div class="loc-val">Lun–Vie: 12:00–00:00 · Sáb–Dom: 12:00–02:00</div></div></div>
+      <div class="loc-item"><span class="loc-ico">🏙️</span><div><div class="loc-lbl">Buenos Aires</div><div class="loc-val">Av. Corrientes 1842, CABA · Palermo / Villa Crespo</div></div></div>
+      <div class="loc-item"><span class="loc-ico">🌆</span><div><div class="loc-lbl">Córdoba</div><div class="loc-val">Av. H. Yrigoyen 650, CBA · Nueva Córdoba / Güemes</div></div></div>
+      <div class="loc-item"><span class="loc-ico">🛵</span><div><div class="loc-lbl">Delivery</div><div class="loc-val">Disponible en ambas ciudades · Pedido mínimo $3.500</div></div></div>
+      <button class="btn-primary" onclick="openModal()" style="margin-top:2rem">Elegir Ciudad y Pedir 🛵</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ════════════════════════════════════════════════════ -->
+<section class="cta-section">
+  <p class="eyebrow reveal">¿Tenés hambre?</p>
+  <h2 class="cta-big reveal">¿QUERÉS<br><span class="cta-g">COMER BACAN?</span></h2>
+  <div class="cta-actions reveal">
+    <button class="btn-primary" onclick="openModal()">🛵 Pedir Ahora</button>
+    <a href="tel:+541145678910" class="btn-ghost">📞 Llamar al Local</a>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════ -->
+<footer>
+  <div class="fg">
+    <div>
+      <div class="f-logo">BACAN.</div>
+      <p class="f-tag">Street food auténtico desde 2018. Hecho con fuego, amor y respeto por el sabor de barrio.</p>
+      <div class="f-soc"><div class="soc">📸</div><div class="soc">🐦</div><div class="soc">💬</div><div class="soc">▶️</div></div>
+    </div>
+    <div>
+      <div class="fc-title">Menú</div>
+      <ul class="fc-links"><li><a href="#">Tacos</a></li><li><a href="#">Burgers</a></li><li><a href="#">Extras</a></li><li><a href="#">Bebidas</a></li><li><a href="#">Combos</a></li></ul>
+    </div>
+    <div>
+      <div class="fc-title">Info</div>
+      <ul class="fc-links"><li><a href="#">Nosotros</a></li><li><a href="#" onclick="openModal();return false">Delivery</a></li><li><a href="#">Franquicias</a></li><li><a href="#">Prensa</a></li><li><a href="#">Sumate al equipo</a></li></ul>
+    </div>
+    <div>
+      <div class="fc-title">Ciudades</div>
+      <ul class="fc-links">
+        <li><a href="https://www.menufudo.com/bacan-buenos-aires" target="_blank">Buenos Aires →</a></li>
+        <li><a href="https://www.menufudo.com/bacan-cordoba" target="_blank">Córdoba →</a></li>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="mailto:info@bacanstreetfood.com">Contacto</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="f-bottom">
+    <p class="f-copy">© 2025 <span>BACAN STREET FOOD</span>. Todos los derechos reservados.</p>
+    <p class="f-copy">Hecho con 🔥 en Argentina</p>
+  </div>
+</footer>
+
+<script>
+const MENU = {
+  tacos:[
+    {emoji:'🌮',tag:'Signature',name:'Taco Bacan',desc:'Carne asada, salsa verde, cilantro fresco y cebolla morada caramelizada.',price:'$1.800',hot:true},
+    {emoji:'🌮',tag:'Veggie',name:'Taco Verde',desc:'Mix de hongos salteados, queso de cabra, rúcula y chimichurri de cilantro.',price:'$1.500',hot:false},
+    {emoji:'🌮',tag:'Clásico',name:'Taco Al Pastor',desc:'Cerdo marinado en adobo, piña grillada, cebolla y salsa roja casera.',price:'$1.700',hot:true},
+  ],
+  burgers:[
+    {emoji:'🍔',tag:'Signature',name:'Bacan Smash',desc:'Doble smash patty, cheddar fundido, pickles, mayo de chipotle y cebolla crispy.',price:'$3.200',hot:true},
+    {emoji:'🍔',tag:'Clásico',name:'Street Burger',desc:'Medallón de 200g, lechuga, tomate, cebolla, ketchup y mostaza artesanal.',price:'$2.600',hot:false},
+    {emoji:'🍔',tag:'Veggie',name:'Green Burger',desc:'Burger de legumbres y quinoa, cheddar vegano, tomates cherry y pesto.',price:'$2.400',hot:false},
+  ],
+  extras:[
+    {emoji:'🍟',tag:'Para compartir',name:'Papas Bravas',desc:'Papas rústicas fritas con pimentón ahumado y alioli de ajo negro.',price:'$1.200',hot:false},
+    {emoji:'🫔',tag:'Nuevo',name:'Wrap Bacan',desc:'Pollo grillado, guacamole fresco, pico de gallo y crema agria en tortilla tostada.',price:'$2.100',hot:true},
+    {emoji:'🫙',tag:'Clásico',name:'Trio de Salsas',desc:'Guacamole, salsa verde tatemada y chimichurri rojo.',price:'$800',hot:false},
+  ],
+  bebidas:[
+    {emoji:'🥤',tag:'Fresca',name:'Limonada de la Casa',desc:'Limonada natural con menta, jengibre y jarabe de agave. Sin gas.',price:'$900',hot:false},
+    {emoji:'🍺',tag:'Artesanal',name:'Cerveza Bacan',desc:'Cerveza artesanal rubia de producción propia. Tirada o en lata.',price:'$1.100',hot:false},
+    {emoji:'☕',tag:'Caliente',name:'Mate Cocido',desc:'Mate cocido con leche o solo, con medialunas caseras.',price:'$700',hot:false},
+  ]
+};
+
+function renderMenu(tab) {
+  document.getElementById('menu-grid').innerHTML = MENU[tab].map(i => `
+    <div class="mc">
+      <div class="mc-img">
+        ${i.hot ? '<span class="b-pop">🔥 Popular</span>' : ''}
+        <span>${i.emoji}</span>
+      </div>
+      <div class="mc-body">
+        <div class="mc-tag">${i.tag}</div>
+        <div class="mc-name">${i.name}</div>
+        <p class="mc-desc">${i.desc}</p>
+        <div class="mc-footer">
+          <span class="mc-price">${i.price}</span>
+          <button class="mc-btn" onclick="openModal()">Pedir</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function setTab(btn, tab) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMenu(tab);
+}
+
+renderMenu('tacos');
+
+// Modal
+function openModal() {
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal')) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

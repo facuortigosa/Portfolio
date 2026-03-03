@@ -29,14 +29,13 @@ const PIPE_W        = 46;
 const PIPE_INTERVAL = 300;   // space between columns
 const PIPE_GAP      = 210;   // vertical opening — fixed across all levels
 const PIPE_SPEED    = 2.4;   // fixed speed across all levels
-const GAME_DURATION = 60;    // total seconds for the whole game
+const GAME_DURATION = 15;    // total seconds for the whole game
 
-// Level definitions: how many columns must be passed to clear the level
+// Level definitions: single level, columns needed to reach the abduction zone
 const LEVELS = [
-  { need: 1, label: "SECTOR 1", sublabel: "pasar 1 columna"  },
-  { need: 3, label: "SECTOR 2", sublabel: "pasar 3 columnas" },
-  { need: 5, label: "SECTOR 3", sublabel: "pasar 5 columnas" },
+  { need: 5, label: "SECTOR ÚNICO", sublabel: "pasar 5 columnas" },
 ];
+const MAX_COLUMNS = LEVELS[0].need;
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 function randomPipeY() {
@@ -47,14 +46,13 @@ function randomPipeY() {
 function makePipe(x) {
   return { x, topH: randomPipeY(), passed: false };
 }
-function initPipes() {
-  // Only spawn as many pipes as the hardest level needs + 1 buffer
-  // We always keep a rolling set; completion is tracked via `columnsPassed`
-  return [
+function initPipes(maxColumns) {
+  const base = [
     makePipe(W + 80),
     makePipe(W + 80 + PIPE_INTERVAL),
     makePipe(W + 80 + PIPE_INTERVAL * 2),
   ];
+  return base.slice(0, Math.min(base.length, maxColumns));
 }
 function makeStars() {
   return Array.from({ length: 60 }, () => ({
@@ -70,7 +68,8 @@ function initState(timeLeft = GAME_DURATION) {
   return {
     ufoY:          H / 2,
     ufoVY:         0,
-    pipes:         initPipes(),
+    pipes:         initPipes(MAX_COLUMNS),
+    totalColumnsCreated: Math.min(3, MAX_COLUMNS),
     columnsPassed: 0,   // columns cleared in this level
     level:         0,   // 0-indexed
     phase:         "idle",   // idle|playing|levelclear|victory|dead|timesup
@@ -224,7 +223,10 @@ export default function proyectoq() {
       // ── pipes ──
       s.pipes.forEach(p => { p.x -= PIPE_SPEED; });
       const last = s.pipes[s.pipes.length - 1];
-      if (last.x < W - PIPE_INTERVAL) s.pipes.push(makePipe(last.x + PIPE_INTERVAL));
+      if (last.x < W - PIPE_INTERVAL && s.totalColumnsCreated < MAX_COLUMNS) {
+        s.pipes.push(makePipe(last.x + PIPE_INTERVAL));
+        s.totalColumnsCreated += 1;
+      }
       s.pipes = s.pipes.filter(p => p.x > -PIPE_W - 10);
 
       // ── column pass detection ──
@@ -360,11 +362,21 @@ export default function proyectoq() {
                 alignItems:     "center",
                 justifyContent: "center",
                 textDecoration: "none",
-                background:     "transparent",
+                background:     "rgba(0,255,136,0.1)",
                 cursor:         "pointer",
                 zIndex:         10,
               }}
-            />
+            >
+              <span style={{
+                fontFamily: "'Orbitron',monospace",
+                fontSize: "11px",
+                letterSpacing: "0.2em",
+                color: "#00FF88",
+                textTransform: "uppercase",
+              }}>
+                ▸ passline.com / 4NIVERSARIQ 💚
+              </span>
+            </a>
           )}
         </div>
         <div style={{
@@ -570,7 +582,7 @@ function drawTimesUp(ctx, t) {
 
   ctx.font = `11px 'Share Tech Mono', monospace`;
   ctx.fillStyle = "rgba(255,34,68,0.55)";
-  ctx.fillText("no llegaste a completar los 3 sectores", W / 2, H / 2 - 20);
+  ctx.fillText("no llegaste a completar la misión.", W / 2, H / 2 - 20);
 
   ctx.font = `bold 12px 'Orbitron', monospace`;
   ctx.fillStyle = `rgba(0,255,136,${0.5 + p * 0.5})`;
@@ -630,9 +642,22 @@ function drawVictory(ctx, t, victoryTs) {
 
   ctx.textAlign = "center";
 
+  // TAP arriba (encima del título)
+  ctx.font = `bold 10px 'Orbitron', monospace`;
+  ctx.fillStyle = unlocked
+    ? `rgba(0,255,136,${0.5 + p * 0.45})`
+    : `rgba(0,255,136,0.3)`;
+  ctx.fillText(
+    unlocked
+      ? "[ TAP / ESPACIO para jugar de nuevo ]"
+      : `[ disponible en ${remaining}s ]`,
+    W / 2,
+    H / 2 - 140
+  );
+
   ctx.font = `900 ${22 + p * 3}px 'Orbitron', monospace`;
   ctx.fillStyle = `rgba(0,255,136,${0.85 + p * 0.15})`;
-  ctx.fillText("✦ MISIÓN CUMPLIDA ✦", W / 2, H / 2 - 110);
+  ctx.fillText("✦ MISION CUMPLIDA ✦", W / 2, H / 2 - 110);
 
   ctx.font = `bold 11px 'Share Tech Mono', monospace`;
   ctx.fillStyle = `rgba(0,255,136,${0.7 + p * 0.2})`;
@@ -645,33 +670,4 @@ function drawVictory(ctx, t, victoryTs) {
   ctx.font = `44px serif`;
   ctx.fillText("🛸", W / 2, H / 2 + 4);
 
-  // CTA link box
-  const boxX = 24, boxW = W - 48, boxH = 42, boxY = H / 2 + 30;
-  ctx.fillStyle = `rgba(0,255,136,${0.07 + p * 0.05})`;
-  ctx.strokeStyle = `rgba(0,255,136,${0.35 + p * 0.25})`;
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.roundRect(boxX, boxY, boxW, boxH, 6);
-  ctx.fill(); ctx.stroke();
-
-  ctx.font = `bold 10px 'Orbitron', monospace`;
-  ctx.fillStyle = `rgba(0,255,136,${0.85 + p * 0.15})`;
-  ctx.fillText("▸  CONSEGUIR ENTRADA", W / 2, boxY + 16);
-
-  ctx.font = `9px 'Share Tech Mono', monospace`;
-  ctx.fillStyle = `rgba(0,255,136,0.45)`;
-  ctx.fillText("passline.com / 4NIVERSARIQ 💚", W / 2, boxY + 30);
-
-  ctx.font = `bold 10px 'Orbitron', monospace`;
-  ctx.fillStyle = unlocked
-    ? `rgba(0,255,136,${0.5 + p * 0.45})`
-    : `rgba(0,255,136,0.3)`;
-  ctx.fillText(
-    unlocked
-      ? "[ TAP / ESPACIO para jugar de nuevo ]"
-      : `[ disponible en ${remaining}s ]`,
-    W / 2, H / 2 + 96
-  );
-
-  ctx.textAlign = "left";
 }

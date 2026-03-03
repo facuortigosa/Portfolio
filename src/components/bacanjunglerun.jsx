@@ -38,12 +38,12 @@ const WALK_SPD   = 140;
 
 // ─── Escala horizontal de nivel ─────────────────────────────────────────────
 // Factor >1 separa más plataformas, aliens y burgers sin cambiar el tamaño de la cámara.
-const X_SCALE = 1.3;
+const X_SCALE = 1;
 // ─── Niveles ─────────────────────────────────────────────────────────────────
 const LEVELS = [
-  { num:1, label:'JUNGLA',       time:60, aliens:3, alienSpd:45, burgerGoal:3, bgTop:0x0a1f0a, bgBot:0x1a3d0f },
-  { num:2, label:'OSCURIDAD', time:40, aliens:5, alienSpd:65, burgerGoal:5, bgTop:0x050f18, bgBot:0x0a2035 },
-  { num:3, label:'INFIERNO',    time:30, aliens:9, alienSpd:88, burgerGoal:9, bgTop:0x1a0500, bgBot:0x3d0f00 },
+  { num:1, label:'JUNGLA',       time:60, aliens:0, alienSpd:45, burgerGoal:3, bgTop:0x0a1f0a, bgBot:0x1a3d0f },
+  { num:2, label:'OSCURIDAD', time:40, aliens:0, alienSpd:65, burgerGoal:5, bgTop:0x050f18, bgBot:0x0a2035 },
+  { num:3, label:'INFIERNO',    time:30, aliens:0, alienSpd:88, burgerGoal:9, bgTop:0x1a0500, bgBot:0x3d0f00 },
 ];
 
 const DISCOUNT_CODE = 'JAGGY20';
@@ -198,29 +198,31 @@ class GameScene extends Phaser.Scene {
     this.tk = this.game._tk;
   }
 
-  create() {
-    this.cameras.main.setRoundPixels(true);
-    const WW = GW * 4.5;   // mundo = 6 pantallas de ancho
+create() {
+  this.cameras.main.setRoundPixels(true);
+  const WW = GW * 2; // ejemplo: mundo más chico
 
-    this._buildBG(WW);
-    this._buildLevel(WW);
-    this._buildPlayer();
+  this._buildBG(WW);
+  this._buildLevel(WW);
+  this._buildPlayer();
+  this._buildAliens();
+  this._buildBurgers();
 
-      console.log('Textura del player:', this.player.texture.key);
-  console.log('Frame actual:', this.player.frame.name);
+  // Portal creado antes de las colisiones para que el overlap se registre
+  this._buildPortal(WW);
 
-    this._buildAliens();
-    this._buildBurgers();
-    this._buildPortal(WW);
-    this._setupCamera(WW);
-    this._setupCollisions();
-    this._setupInput();
-    this._buildHUD();
+  // Camera y physics bounds
+  this._setupCamera(WW);
 
-    this.cameras.main.fadeIn(300,0,0,0);
-    this._timerEv = this.time.addEvent({ delay:1000, callback:this._tick, callbackScope:this, loop:true });
-  }
+  // Colisiones (ahora sí la overlap con this.portal funcionará)
+  this._setupCollisions();
 
+  this._setupInput();
+  this._buildHUD();
+
+  this.cameras.main.fadeIn(300,0,0,0);
+  this._timerEv = this.time.addEvent({ delay:1000, callback:this._tick, callbackScope:this, loop:true });
+}
   update() {
     if (this._dead || this._win) return;
     this._handleMove();
@@ -273,34 +275,46 @@ class GameScene extends Phaser.Scene {
   }
 
   // ── NIVEL (tiles + física) ────────────────────────────────────────────────
-  _buildLevel(WW) {
-    this.platforms = this.physics.add.staticGroup();
+_buildLevel(WW) {
+  this.platforms = this.physics.add.staticGroup();
 
-    // Suelo físico invisible
-    const gnd = this.add.rectangle(WW/2, GH-4, WW+64, 16, 0,0);
-    this.physics.add.existing(gnd, true);
-    this.platforms.add(gnd);
+  // Suelo físico invisible
+  const gnd = this.add.rectangle(WW/2, GH-4, WW+64, 16, 0,0);
+  this.physics.add.existing(gnd, true);
+  this.platforms.add(gnd);
 
-    // Plataformas: [x_inicio, y, num_tiles]
-    // Espaciado pensado para que Jaggy pueda saltar entre ellas — X_SCALE abre más la distancia.
-    const defs = [
-      [30,  GH-44, 5], [110, GH-62, 4], [195, GH-46, 5],
-      [280, GH-64, 4], [365, GH-48, 5], [450, GH-66, 4],
-      [535, GH-50, 5], [620, GH-64, 4], [705, GH-48, 5],
-      [790, GH-66, 4], [875, GH-50, 5], [960, GH-64, 4],
-      [1045,GH-48, 5], [1130,GH-66, 4], [1215,GH-50, 5],
-      [1300,GH-64, 4], [1385,GH-48, 5],
-    ];
+  const defs = [
+    [30,  GH-52, 4],  [110, GH-78, 4], [195, GH-54, 4],
+    [280, GH-86, 4],  [365, GH-60, 4], [450, GH-92, 4],
+    [535, GH-62, 4], 
+  ];
 
-    defs.forEach(([xs,y,tc]) => {
-      const baseX = xs * X_SCALE;
-      for (let i=0;i<tc;i++) {
-        const t = this.add.image(baseX + i*16*X_SCALE + 8, y,'plat_tile').setDepth(3);
-        this.physics.add.existing(t,true);
-        this.platforms.add(t);
+  this.platformDefs = defs;
+
+  // Variables para la última plataforma en coordenadas del mundo (borde superior)
+  let lastWorldLeft = 0, lastWorldY = GH - 16, lastWorldWidth = 0;
+
+  defs.forEach(([xs, y, tc], defIndex) => {
+    const baseX = xs * X_SCALE;
+    for (let i = 0; i < tc; i++) {
+      // calculo del centro del tile (coincide con cómo lo creabas antes)
+      const tileCenterX = baseX + i * 16 * X_SCALE + 8;
+      const t = this.add.image(tileCenterX, y, 'plat_tile').setDepth(3);
+      this.physics.add.existing(t, true);
+      this.platforms.add(t);
+
+      // si es la última tile de la última definición, guardamos el borde superior real
+      if (defIndex === defs.length - 1 && i === tc - 1) {
+        lastWorldLeft = tileCenterX - (16 * X_SCALE) / 2; // borde izquierdo de la última tile
+        // y es el centro de la plataforma (8px de alto), así que el borde superior es y - 4
+        lastWorldY = y - 4;
+        lastWorldWidth = tc * 16 * X_SCALE;
       }
-    });
-  }
+    }
+  });
+
+  this.lastPlatformWorld = { x: lastWorldLeft, y: lastWorldY, width: lastWorldWidth };
+}
 
   // ── PLAYER ────────────────────────────────────────────────────────────────
   _buildPlayer() {
@@ -324,9 +338,6 @@ class GameScene extends Phaser.Scene {
       {x:548, y:GH-40, l:525, r:608},
       {x:718, y:GH-40, l:700, r:775},
       {x:878, y:GH-40, l:860, r:940},
-      {x:1058,y:GH-40, l:1038,r:1118},
-      {x:1228,y:GH-40, l:1208,r:1288},
-      {x:1398,y:GH-40, l:1378,r:1458},
     ];
 
     // Aplicamos X_SCALE para que las patrullas queden más separadas
@@ -350,19 +361,36 @@ class GameScene extends Phaser.Scene {
   _buildBurgers() {
     this.burgers = this.physics.add.staticGroup();
 
-    // Burgers: pocas arriba (3) + varias a nivel suelo para obligar a bajar
-    const pos = [
-      // solo 3 arriba de plataformas (inicio, medio, casi meta)
-      [124,GH-74],
-      [718,GH-60],
-      [1228,GH-62],
-      // a nivel suelo (un poco más arriba del piso físico)
-      [90,GH-24],[230,GH-24],[370,GH-24],[510,GH-24],
-      [650,GH-24],[790,GH-24],[930,GH-24],[1070,GH-24],
-      [1210,GH-24],[1350,GH-24],
+    // Burgers: mezcla de plataformas y suelo para que siempre haya algo que recoger
+    const platformPos = (this.platformDefs || []).map(([xs,y,tc]) => {
+      const centerX = xs + (tc*16)/2;
+      const offsetY = y - 22;
+      return [centerX, offsetY];
+    });
+
+    // seleccionamos algunas plataformas concretas para no sobrecargar
+    const sampledPlat = [
+      platformPos[0],
+      platformPos[2],
+      platformPos[4],
+      platformPos[6],
+      platformPos[8],
+    ].filter(Boolean);
+
+    // Burgers en el suelo, alineadas con huecos entre plataformas
+    const groundPos = [
+      [80,  GH-24],
+      [220, GH-24],
+      [360, GH-24],
+      [500, GH-24],
+      [640, GH-24],
+      [780, GH-24],
+      [920, GH-24],
     ];
 
-    // Usamos X_SCALE también aquí para alinear con las nuevas plataformas
+    const pos = [...sampledPlat, ...groundPos];
+
+    // Usamos X_SCALE también aquí para alinear con las plataformas
     pos.forEach(([x,y]) => {
       const sx = x * X_SCALE;
       const b = this.burgers.create(sx, y, 'burger', 0);
@@ -376,21 +404,66 @@ class GameScene extends Phaser.Scene {
 
   // ── PORTAL ────────────────────────────────────────────────────────────────
   _buildPortal(WW) {
-    this.portal = this.physics.add.staticSprite(WW-36, GH-16, 'portal');
-    this.portal.setDepth(4).setOrigin(0.5,1).refreshBody();
-    this.tweens.add({ targets:this.portal, alpha:0.5, duration:600, yoyo:true, repeat:-1 });
-    this.add.text(WW-36, GH-64, 'META', {
-      fontSize:'8px', fontFamily:'"Press Start 2P",monospace',
-      color:'#FAB910', stroke:'#000', strokeThickness:2,
-    }).setOrigin(0.5).setDepth(4);
+    // Queremos que el portal apoye VISUALMENTE sobre el suelo del juego,
+    // no flotando con respecto a la última plataforma.
+    // El suelo visual (tiles `ground_tile`) se dibuja con centro en GH-8 y alto 16px,
+    // por lo que su borde superior está en GH-16.
+    const groundTopY = GH - 16;
+
+    // Usamos la última plataforma solo para decidir la X aproximada (un poco después),
+    // pero el Y siempre será el del suelo.
+    if (this.lastPlatformWorld && this.lastPlatformWorld.width > 0) {
+      const px = this.lastPlatformWorld.x + this.lastPlatformWorld.width + 256;
+      const py = groundTopY;
+      this._createPortalAt(px, py);
+    } else {
+      // fallback: al borde del mundo sobre el suelo
+      const px = WW - 36;
+      const py = groundTopY;
+      this._createPortalAt(px, py);
+    }
   }
 
-  // ── CÁMARA ────────────────────────────────────────────────────────────────
-  _setupCamera(WW) {
-    this.physics.world.setBounds(0,0,WW,GH+100);
-    this.cameras.main.setBounds(0,0,WW,GH);
-    this.cameras.main.startFollow(this.player,true,0.1,0.1);
+_createPortalAt(px, py) {
+  if (this.portal) {
+    this.portal.destroy();
   }
+
+  // Origin 0.5,1 para que "apoye" sobre la plataforma/suelo
+  this.portal = this.physics.add.staticSprite(px, py, 'portal')
+    .setDepth(1)
+    .setOrigin(0.5, 1);
+
+  // Ajustar el cuerpo de colisión para mayor fiabilidad
+  const w = Math.round(this.portal.displayWidth * 0.8);
+  const h = Math.round(this.portal.displayHeight * 0.9);
+  this.portal.body.setSize(w, h);
+  this.portal.refreshBody();
+
+  this.tweens.add({
+    targets: this.portal,
+    alpha: 0.5,
+    duration: 600,
+    yoyo: true,
+    repeat: -1
+  });
+
+  // Texto indicador (centro sobre el portal)
+  this.add.text(px, py - 48, 'META', {
+    fontSize: '8px',
+    fontFamily: '"Press Start 2P", monospace',
+    color: '#FAB910',
+    stroke: '#000',
+    strokeThickness: 2,
+  }).setOrigin(0.5).setDepth(1);
+}
+
+  // ── CÁMARA ────────────────────────────────────────────────────────────────
+_setupCamera(WW) {
+  this.cameras.main.setBounds(0, 0, WW, GH);
+  this.physics.world.setBounds(0, 0, WW, GH);
+  this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+}
 
   // ── COLISIONES ────────────────────────────────────────────────────────────
   _setupCollisions() {
@@ -571,61 +644,177 @@ class GameScene extends Phaser.Scene {
 // WIN SCENE
 // ════════════════════════════════════════════════════════════════════════════
 class WinScene extends Phaser.Scene {
-  constructor() { super({ key:'WinScene' }); }
-  init(data) { this.finalScore = data.score??0; }
+  constructor() {
+    super({ key: 'WinScene' });
+  }
+
+  init(data = {}) {
+    // Prefer passing these via data for testability and reuse
+    this.finalScore = data.score ?? 0;
+    this.GW = data.gw ?? GW;
+    this.GH = data.gh ?? GH;
+    this.DISCOUNT_CODE = data.discountCode ?? DISCOUNT_CODE;
+    this.JAGGY_SCALE = data.jaggyScale ?? JAGGY_SCALE;
+  }
 
   create() {
-    this.cameras.main.fadeIn(500,0,0,0);
-    const g = this.add.graphics();
-    g.fillStyle(0x050a05); g.fillRect(0,0,GW,GH);
-    const cols=[0xFAB910,0x562373,0xf97316,0x22c55e,0xff4488,0x00aaff];
-    for (let i=0;i<120;i++) {
-      g.fillStyle(Phaser.Math.RND.pick(cols));
-      g.fillRect(Phaser.Math.Between(0,GW),Phaser.Math.Between(0,GH),3,3);
+    const { GW, GH } = this;
+    this.cameras.main.fadeIn(500, 0, 0, 0);
+
+    // Background + particles (draw first so UI sits above)
+    this.bgGraphics = this.add.graphics().setDepth(0);
+    this.bgGraphics.fillStyle(0x050a05);
+    this.bgGraphics.fillRect(0, 0, GW, GH);
+
+    const cols = [0xFAB910, 0x562373, 0xf97316, 0x22c55e, 0xff4488, 0x00aaff];
+    const dotSize = 3;
+    for (let i = 0; i < 120; i++) {
+      this.bgGraphics.fillStyle(Phaser.Math.RND.pick(cols));
+      const x = Phaser.Math.Between(0, GW - dotSize);
+      const y = Phaser.Math.Between(0, GH - dotSize);
+      this.bgGraphics.fillRect(x, y, dotSize, dotSize);
     }
 
-    const cx=GW/2;
-    const T=(y,txt,sz,col='#FAB910')=>this.add.text(cx,y,txt,{
-      fontSize:`${sz}px`,fontFamily:'"Press Start 2P",monospace',
-      color:col,stroke:'#000000',strokeThickness:3,
-      align:'center',wordWrap:{width:GW-20},
-    }).setOrigin(0.5).setDepth(5);
+    // Optional portal builder (keep if implemented elsewhere)
+    if (typeof this._buildPortal === 'function') {
+      this._buildPortal();
+    }
 
-    T(14,'★ COMPLETADO ★',9,'#FAB910');
-    T(30,'¡JAGGY GANA!',7,'#aaffaa');
+    const cx = GW / 2;
+    const makeText = (y, txt, sz, col = '#FAB910') => {
+      return this.add.text(cx, y, txt, {
+        fontSize: `${sz}px`,
+        fontFamily: '"Press Start 2P",monospace',
+        color: col,
+        stroke: '#000000',
+        strokeThickness: 3,
+        align: 'center',
+        wordWrap: { width: GW - 20 }
+      }).setOrigin(0.5).setDepth(5);
+    };
 
-    const jag = this.add.sprite(cx,105,'jaggy',9).setDepth(5).setScale(JAGGY_SCALE*1.3);
-    this.tweens.add({targets:jag,scaleX:JAGGY_SCALE*1.4,scaleY:JAGGY_SCALE*1.4,
-      duration:700,yoyo:true,repeat:-1,ease:'Sine.easeInOut'});
+    makeText(14, '★ COMPLETADO ★', 9, '#FAB910');
+    makeText(30, '¡JAGGY GANA!', 7, '#aaffaa');
 
-    T(152,`SCORE: ${this.finalScore}`,8);
+    // Jaggy sprite with breathing tween
+    const jag = this.add.sprite(cx, 105, 'jaggy', 9).setDepth(5)
+      .setScale(this.JAGGY_SCALE * 1.3);
+    this.tweens.add({
+      targets: jag,
+      scaleX: this.JAGGY_SCALE * 1.4,
+      scaleY: this.JAGGY_SCALE * 1.4,
+      duration: 700,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
 
-    // Caja cupón
-    g.lineStyle(2,0xFAB910); g.strokeRect(14,165,GW-28,80);
-    g.fillStyle(0xFAB910,0.07); g.fillRect(14,165,GW-28,80);
+    makeText(152, `SCORE: ${this.finalScore}`, 8);
 
-    T(172,'🍔 TU DESCUENTO',6,'#aaffaa');
-    const ct=T(192,DISCOUNT_CODE,16,'#FAB910');
-    this.tweens.add({targets:ct,scaleX:1.06,scaleY:1.06,duration:500,yoyo:true,repeat:-1});
-    T(215,'20% OFF en Bacan',6,'#ffffff');
-    T(228,'Mostrá esta pantalla 🔥',5,'#f97316');
+    // Coupon box (use separate graphics so we can clear/destroy easily)
+    this.uiGraphics = this.add.graphics().setDepth(2);
+    const boxX = 14, boxY = 165, boxW = GW - 28, boxH = 80;
+    this.uiGraphics.lineStyle(2, 0xFAB910);
+    this.uiGraphics.strokeRect(boxX, boxY, boxW, boxH);
+    this.uiGraphics.fillStyle(0xFAB910, 0.07);
+    this.uiGraphics.fillRect(boxX, boxY, boxW, boxH);
 
-    // Botón
-    const btnY=252;
-    const bb=this.add.graphics().setDepth(5);
-    const drBtn=h=>{bb.clear();bb.fillStyle(h?0x7c3aed:0x562373);
-      bb.fillRect(cx-68,btnY-9,136,22);bb.lineStyle(2,0xFAB910);bb.strokeRect(cx-68,btnY-9,136,22);};
-    drBtn(false);
-    T(btnY+2,'▶ JUGAR DE NUEVO',6,'#FAB910');
-    const zone=this.add.zone(cx,btnY+2,136,22).setInteractive({useHandCursor:true});
-    zone.on('pointerover',()=>drBtn(true));
-    zone.on('pointerout', ()=>drBtn(false));
-    zone.on('pointerdown',()=>{ this.game.events.emit('restartGame'); this.scene.start('BootScene'); });
+    makeText(172, '🍔 TU DESCUENTO', 6, '#aaffaa');
 
-    this.game.events.emit('gameWon',{code:DISCOUNT_CODE,score:this.finalScore});
+    // Discount code text (animated)
+    const codeText = makeText(192, this.DISCOUNT_CODE, 16, '#FAB910');
+    this.tweens.add({
+      targets: codeText,
+      scaleX: 1.06,
+      scaleY: 1.06,
+      duration: 500,
+      yoyo: true,
+      repeat: -1
+    });
+
+    makeText(215, '20% OFF en Bacan', 6, '#ffffff');
+    makeText(228, 'Mostrá esta pantalla 🔥', 5, '#f97316');
+
+    // Button (drawn with graphics for hover effect)
+    const btnY = 252;
+    this.btnGraphics = this.add.graphics().setDepth(5);
+    const btnW = 136, btnH = 22;
+    const btnX = cx - btnW / 2;
+    const drawBtn = (hover = false) => {
+      this.btnGraphics.clear();
+      this.btnGraphics.fillStyle(hover ? 0x7c3aed : 0x562373);
+      this.btnGraphics.fillRect(btnX, btnY - 9, btnW, btnH);
+      this.btnGraphics.lineStyle(2, 0xFAB910);
+      this.btnGraphics.strokeRect(btnX, btnY - 9, btnW, btnH);
+    };
+    drawBtn(false);
+    makeText(btnY + 2, '▶ JUGAR DE NUEVO', 6, '#FAB910');
+
+    // Use a rectangle game object for accurate hit area and depth
+    const btnRect = this.add.rectangle(cx, btnY + 2, btnW, btnH, 0x000000, 0)
+      .setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(6);
+
+    btnRect.on('pointerover', () => drawBtn(true));
+    btnRect.on('pointerout', () => drawBtn(false));
+
+    // Use pointerup to avoid accidental triggers on pointerdown drag
+    btnRect.on('pointerup', () => {
+      // Emit restart and go to BootScene (keep your flow)
+      this.game.events.emit('restartGame');
+      this.scene.start('BootScene');
+    });
+
+    // Keyboard accessibility: Enter / Space to restart
+    this.input.keyboard.on('keydown-ENTER', this._onRestartKey, this);
+    this.input.keyboard.on('keydown-SPACE', this._onRestartKey, this);
+
+    // Optional: copy discount code on click of the code text (if browser supports clipboard)
+    codeText.setInteractive({ useHandCursor: true }).on('pointerup', () => {
+      if (navigator && navigator.clipboard && this.DISCOUNT_CODE) {
+        navigator.clipboard.writeText(this.DISCOUNT_CODE).catch(() => {});
+      }
+    });
+
+    // Emit gameWon event
+    this.game.events.emit('gameWon', { code: this.DISCOUNT_CODE, score: this.finalScore });
+
+    // Keep references for cleanup
+    this._refs = { jag, codeText, btnRect };
+  }
+
+  _onRestartKey() {
+    this.game.events.emit('restartGame');
+    this.scene.start('BootScene');
+  }
+
+  // Clean up to avoid leaks if scene is restarted or removed
+  shutdown() {
+    this._destroyRefs();
+  }
+
+  destroy() {
+    this._destroyRefs();
+    super.destroy && super.destroy();
+  }
+
+  _destroyRefs() {
+    if (this._refs) {
+      // remove keyboard listeners
+      this.input.keyboard.off('keydown-ENTER', this._onRestartKey, this);
+      this.input.keyboard.off('keydown-SPACE', this._onRestartKey, this);
+
+      // destroy graphics and objects
+      this.bgGraphics && this.bgGraphics.destroy();
+      this.uiGraphics && this.uiGraphics.destroy();
+      this.btnGraphics && this.btnGraphics.destroy();
+      this._refs.jag && this._refs.jag.destroy();
+      this._refs.codeText && this._refs.codeText.destroy();
+      this._refs.btnRect && this._refs.btnRect.destroy();
+
+      this._refs = null;
+    }
   }
 }
-
 // ════════════════════════════════════════════════════════════════════════════
 // COMPONENTE REACT
 // ════════════════════════════════════════════════════════════════════════════
@@ -657,8 +846,6 @@ export default function BacanGame() {
       scale:{
         mode:       Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width:  GW,
-        height: GH,
       },
     });
     game._tk = tkState;   // ← asignado ANTES de que cualquier escena corra init()
@@ -775,15 +962,15 @@ const S = {
   back:{
     background:'transparent',border:'1px solid #562373',
     borderRadius:'3px',color:'#FAB910',
-    fontSize:'6px',fontFamily:'inherit',
+    fontSize:'6px',fontFamily:'"Press Start 2P","Courier New",monospace',
     padding:'5px 7px',cursor:'pointer',touchAction:'manipulation',
   },
   title:{display:'flex',flexDirection:'column',alignItems:'center',gap:'2px'},
-  brand:{fontSize:'13px',color:'#562373',letterSpacing:'3px',textShadow:'0 0 10px #56237366'},
-  sub:  {fontSize:'6px',color:'#FAB910',letterSpacing:'2px'},
+  brand:{fontSize:'13px',color:'#562373',letterSpacing:'3px',textShadow:'0 0 10px #56237366',fontFamily:'"Press Start 2P","Courier New",monospace'},
+  sub:  {fontSize:'6px',color:'#FAB910',letterSpacing:'2px',fontFamily:'"Press Start 2P","Courier New",monospace'},
   scoreBox:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:'1px'},
-  scoreLbl:{fontSize:'5px',color:'#562373',letterSpacing:'2px'},
-  scoreVal:{fontSize:'18px',color:'#FAB910',textShadow:'0 0 6px #FAB91066',lineHeight:1},
+  scoreLbl:{fontSize:'5px',color:'#562373',letterSpacing:'2px',fontFamily:'"Press Start 2P","Courier New",monospace'},
+  scoreVal:{fontSize:'18px',color:'#FAB910',textShadow:'0 0 6px #FAB91066',lineHeight:1,fontFamily:'"Press Start 2P","Courier New",monospace'},
 
   lvlBar:{
     display:'flex',alignItems:'center',gap:'8px',
@@ -848,7 +1035,7 @@ const S = {
   kbd:{
     background:'#1a0a2e',border:'1px solid #562373',
     borderRadius:'2px',color:'#FAB910',
-    fontSize:'6px',fontFamily:'monospace',padding:'1px 3px',margin:'0 1px',
+    fontSize:'6px',fontFamily:'"Press Start 2P","Courier New",monospace',padding:'1px 3px',margin:'0 1px',
   },
   coupon:{
     display:'flex',alignItems:'center',flexWrap:'wrap',justifyContent:'center',gap:'5px',
@@ -856,6 +1043,88 @@ const S = {
     padding:'8px 12px',boxSizing:'border-box',
     background:'#1a0a00',borderTop:'2px solid #FAB910',marginTop:'4px',
   },
-  couponTxt:{fontSize:'7px',color:'#562373',fontFamily:'inherit'},
-  couponCode:{fontSize:'14px',color:'#FAB910',fontFamily:'inherit',letterSpacing:'2px',textShadow:'0 0 8px #FAB91088'},
+  couponTxt:{fontSize:'7px',color:'#562373',fontFamily:'"Press Start 2P","Courier New",monospace'},
+  couponCode:{fontSize:'14px',color:'#FAB910',fontFamily:'"Press Start 2P","Courier New",monospace',letterSpacing:'2px',textShadow:'0 0 8px #FAB91088'},
 };
+
+// Breakpoints recomendados
+const BREAKS = {
+  notebook: '(min-width: 900px) and (max-width: 1365px)',
+  desktop: '(min-width: 1366px)'
+};
+
+// Valores de override para desktop/notebook
+const OVERRIDES = {
+  notebook: {
+    page: { maxWidth: '920px', padding: '0 16px' },
+    canvas: { maxWidth: '880px' },
+    brand: { fontSize: '15px' },
+    scoreVal: { fontSize: '20px' },
+    btnMove: { width: '84px', height: '84px' },
+    btnJump: { width: '96px', height: '96px' }
+  },
+  desktop: {
+    page: { maxWidth: '1200px', padding: '0 24px' },
+    canvas: { maxWidth: '1100px' },
+    brand: { fontSize: '18px' },
+    scoreVal: { fontSize: '22px' },
+    btnMove: { width: '96px', height: '96px' },
+    btnJump: { width: '110px', height: '110px' }
+  }
+};
+
+// Aplica overrides sobre S (no muta referencias profundas innecesarias)
+function applyOverrides(base, overrides) {
+  const result = { ...base };
+  for (const key in overrides) {
+    result[key] = { ...(base[key] || {}), ...(overrides[key] || {}) };
+  }
+  return result;
+}
+
+// Inicializa matchMedia y listeners
+function initResponsiveStyles(S, onUpdate) {
+  const mqNotebook = window.matchMedia(BREAKS.notebook);
+  const mqDesktop = window.matchMedia(BREAKS.desktop);
+
+  // Debounce simple
+  let timer = null;
+  function scheduleUpdate() {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      timer = null;
+      updateStyles();
+    }, 80);
+  }
+
+  function updateStyles() {
+    // Empieza con la base
+    let newS = { ...S };
+
+    // Aplica notebook si coincide
+    if (mqNotebook.matches) {
+      newS = applyOverrides(newS, OVERRIDES.notebook);
+    }
+
+    // Aplica desktop si coincide (desktop tiene prioridad sobre notebook)
+    if (mqDesktop.matches) {
+      newS = applyOverrides(newS, OVERRIDES.desktop);
+    }
+
+    // Llamada de retorno para que la app reaplique estilos (React setState, o re-render manual)
+    if (typeof onUpdate === 'function') onUpdate(newS);
+  }
+
+  // Escuchar cambios
+  mqNotebook.addEventListener ? mqNotebook.addEventListener('change', scheduleUpdate) : mqNotebook.addListener(scheduleUpdate);
+  mqDesktop.addEventListener ? mqDesktop.addEventListener('change', scheduleUpdate) : mqDesktop.addListener(scheduleUpdate);
+
+  // Primera aplicación
+  updateStyles();
+
+  // Devuelve función para limpiar listeners si es necesario
+  return () => {
+    mqNotebook.removeEventListener ? mqNotebook.removeEventListener('change', scheduleUpdate) : mqNotebook.removeListener(scheduleUpdate);
+    mqDesktop.removeEventListener ? mqDesktop.removeEventListener('change', scheduleUpdate) : mqDesktop.removeListener(scheduleUpdate);
+  };
+}
