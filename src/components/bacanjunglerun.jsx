@@ -41,9 +41,9 @@ const WALK_SPD   = 140;
 const X_SCALE = 1;
 // ─── Niveles ─────────────────────────────────────────────────────────────────
 const LEVELS = [
-  { num:1, label:'JUNGLA',       time:60, aliens:0, alienSpd:45, burgerGoal:3, bgTop:0x0a1f0a, bgBot:0x1a3d0f },
-  { num:2, label:'OSCURIDAD', time:40, aliens:0, alienSpd:65, burgerGoal:5, bgTop:0x050f18, bgBot:0x0a2035 },
-  { num:3, label:'INFIERNO',    time:30, aliens:0, alienSpd:88, burgerGoal:9, bgTop:0x1a0500, bgBot:0x3d0f00 },
+  { num:1, label:'JUNGLA',       time:60, aliens:2, alienSpd:45, burgerGoal:3, bgTop:0x0a1f0a, bgBot:0x1a3d0f },
+  { num:2, label:'OSCURIDAD', time:40, aliens:4, alienSpd:65, burgerGoal:5, bgTop:0x050f18, bgBot:0x0a2035 },
+  { num:3, label:'INFIERNO',    time:30, aliens:6, alienSpd:88, burgerGoal:9, bgTop:0x1a0500, bgBot:0x3d0f00 },
 ];
 
 const DISCOUNT_CODE = 'JAGGY20';
