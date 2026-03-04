@@ -5,7 +5,7 @@ import Hero from './components/Hero.jsx'
 import Projects from './components/Projects.jsx'
 import Skills from './components/Skills.jsx'
 import Footer from './components/Footer.jsx'
-import BacanGame from './components/bacanjunglerun.jsx'
+import BacanGame from './components/BacanJungleRun.jsx'
 import ProyectoQ from './components/ProyectoQ.jsx'
 
 function Portfolio() {
