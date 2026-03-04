@@ -543,7 +543,7 @@ function drawIdle(ctx, t) {
 
   ctx.font = `10px 'Share Tech Mono', monospace`;
   ctx.fillStyle = "rgba(200,255,220,0.35)";
-  ctx.fillText(`⏱  ${GAME_DURATION}s totales · si morís volvés al inicio`, W / 2, H / 2 + 30);
+  ctx.fillText(`⏱  ${GAME_DURATION}s totales · si chocas o te caes, volvés al inicio`, W / 2, H / 2 + 30);
 
   ctx.font = `bold 12px 'Orbitron', monospace`;
   ctx.fillStyle = `rgba(0,255,136,${0.5 + p * 0.5})`;
