@@ -17,7 +17,7 @@ const sampleProjects = [
   {
     title: 'REFUGIO EL MURITO',
     desc: '',
-    link: 'https://refugio-el-murito-mje43loqxzsoklwq.builder-preview.com/',
+    link: 'https://elmurito.com/',
     className: 'project-card--elmurito'
   },
 
