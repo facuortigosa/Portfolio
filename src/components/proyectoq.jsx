@@ -341,6 +341,9 @@ export default function proyectoq() {
               position: "absolute", top: 0, left: 0,
               width: "100%", height: "100%",
               display: "block", cursor: "pointer",
+                  WebkitTapHighlightColor: "transparent",
+                  touchAction: "none",
+                  userSelect: "none"
             }}
           />
           {/* Victory link — rendered as real HTML so it's actually clickable */}
@@ -460,7 +463,7 @@ function drawUFO(ctx, x, y, vy, glow, t) {
   [-18, -9, 0, 9, 18].forEach((lx, i) => {
     const on = Math.sin(t * 0.006 + i * 1.2) > 0.15;
     ctx.beginPath(); ctx.arc(lx, 10, 2.8, 0, Math.PI * 2);
-    if (on) { ctx.shadowColor = C.green; ctx.shadowBlur = 7; ctx.fillStyle = C.green; }
+    if (on) { ctx.shadowColor = C.green; ctx.shadowBlur = 3; ctx.fillStyle = C.green; }
     else ctx.fillStyle = "rgba(0,255,136,0.08)";
     ctx.fill(); ctx.shadowBlur = 0;
   });
